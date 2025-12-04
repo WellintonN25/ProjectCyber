@@ -5,365 +5,240 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEON DASH - Cyberpunk Game</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Efeito de scanline -->
+    <!-- Efeitos visuais -->
     <div class="scanline"></div>
+    <div id="particles"></div>
     
-    <!-- Partículas flutuantes -->
-    <div class="particles" id="particles"></div>
-    
-    <!-- Modal de confirmação -->
-    <div class="modal" id="confirmationModal">
+    <!-- Modal -->
+    <div class="modal" id="modal">
         <div class="modal-content">
-            <h2 class="modal-title" id="modalTitle">CONFIRMAR AÇÃO</h2>
-            <p id="modalMessage">Você tem certeza que deseja executar esta ação?</p>
+            <h2 id="modalTitle">CONFIRMAR</h2>
+            <p id="modalText">Você tem certeza?</p>
             <div class="modal-buttons">
-                <button class="modal-btn cancel" id="modalCancel">CANCELAR</button>
-                <button class="modal-btn confirm" id="modalConfirm">CONFIRMAR</button>
+                <button id="modalCancel" class="btn btn-cancel">CANCELAR</button>
+                <button id="modalConfirm" class="btn btn-confirm">CONFIRMAR</button>
             </div>
         </div>
     </div>
 
+    <!-- Container principal -->
     <div class="container">
         <!-- Cabeçalho -->
         <header class="header">
-            <h1 class="logo glitch" data-text="NEON DASH" id="mainLogo">NEON DASH</h1>
-            <div class="status-bar">
-                <div class="status-item" id="creditsBtn">
-                    <i class="fas fa-coins"></i> CREDITS: <span id="creditsValue">12,450</span>
+            <h1 class="logo" id="logo">NEON<span>DASH</span></h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <i class="fas fa-coins"></i>
+                    <span id="credits">12,450</span>cr
                 </div>
-                <div class="status-item" id="levelBtn">
-                    <i class="fas fa-shield-alt"></i> LEVEL: <span id="levelValue">24</span>
+                <div class="stat-item">
+                    <i class="fas fa-level-up-alt"></i>
+                    LVL <span id="level">24</span>
                 </div>
-                <div class="status-item" id="healthBtn">
-                    <i class="fas fa-heart"></i> HP: <span id="healthValue">85%</span>
-                </div>
-                <div class="status-item" id="energyBtn">
-                    <i class="fas fa-bolt"></i> ENERGY: <span id="energyValue">72%</span>
+                <div class="stat-item">
+                    <i class="fas fa-heart"></i>
+                    <span id="health">85</span>%
                 </div>
             </div>
         </header>
-        
+
         <!-- Conteúdo principal -->
-        <main class="main-content">
-            <!-- Menu principal -->
-            <section class="main-menu">
-                <h2 class="menu-title">
-                    <i class="fas fa-gamepad"></i> MENU PRINCIPAL
-                </h2>
-                
-                <ul class="menu-options">
-                    <li class="menu-item">
-                        <button class="menu-btn active" data-content="missions">
-                            <i class="fas fa-play"></i> INICIAR MISSÃO
-                        </button>
-                    </li>
-                    <li class="menu-item">
-                        <button class="menu-btn" data-content="character">
-                            <i class="fas fa-user-ninja"></i> PERSONAGEM
-                        </button>
-                    </li>
-                    <li class="menu-item">
-                        <button class="menu-btn" data-content="inventory">
-                            <i class="fas fa-cogs"></i> EQUIPAMENTOS
-                        </button>
-                    </li>
-                    <li class="menu-item">
-                        <button class="menu-btn" data-content="map">
-                            <i class="fas fa-map-marked-alt"></i> MAPA DA CIDADE
-                        </button>
-                    </li>
-                    <li class="menu-item">
-                        <button class="menu-btn" data-content="settings">
-                            <i class="fas fa-sliders-h"></i> CONFIGURAÇÕES
-                        </button>
-                    </li>
-                    <li class="menu-item">
-                        <button class="menu-btn" id="logoutBtn">
-                            <i class="fas fa-power-off"></i> SAIR DO SISTEMA
-                        </button>
-                    </li>
-                </ul>
-            </section>
-            
-            <!-- Painel lateral -->
-            <aside class="side-panel">
+        <main class="main">
+            <!-- Menu lateral -->
+            <nav class="sidebar">
+                <div class="menu">
+                    <button class="menu-btn active" data-tab="missions">
+                        <i class="fas fa-play"></i> Missões
+                    </button>
+                    <button class="menu-btn" data-tab="character">
+                        <i class="fas fa-user"></i> Personagem
+                    </button>
+                    <button class="menu-btn" data-tab="inventory">
+                        <i class="fas fa-box"></i> Inventário
+                    </button>
+                    <button class="menu-btn" data-tab="map">
+                        <i class="fas fa-map"></i> Mapa
+                    </button>
+                    <button class="menu-btn" data-tab="settings">
+                        <i class="fas fa-cog"></i> Config
+                    </button>
+                </div>
+
                 <!-- Status do jogador -->
-                <div class="panel-box">
-                    <h3 class="panel-title">STATUS DO OPERADOR</h3>
-                    <div class="player-stats">
+                <div class="player-status">
+                    <h3><i class="fas fa-chart-line"></i> STATUS</h3>
+                    <div class="status-bars">
                         <div class="stat">
-                            <span class="stat-label">FORÇA</span>
-                            <span class="stat-value" id="strengthValue">68%</span>
-                            <div class="stat-bar">
-                                <div class="stat-fill" id="strengthBar" style="width: 68%"></div>
+                            <label>FORÇA</label>
+                            <div class="bar">
+                                <div class="fill" id="strBar" style="width: 68%"></div>
                             </div>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">HACKING</span>
-                            <span class="stat-value" id="hackingValue">94%</span>
-                            <div class="stat-bar">
-                                <div class="stat-fill" id="hackingBar" style="width: 94%"></div>
-                            </div>
+                            <span id="strValue">68%</span>
                         </div>
                         <div class="stat">
-                            <span class="stat-label">AGILIDADE</span>
-                            <span class="stat-value" id="agilityValue">76%</span>
-                            <div class="stat-bar">
-                                <div class="stat-fill" id="agilityBar" style="width: 76%"></div>
+                            <label>HACKING</label>
+                            <div class="bar">
+                                <div class="fill" id="hackBar" style="width: 94%"></div>
                             </div>
+                            <span id="hackValue">94%</span>
                         </div>
                         <div class="stat">
-                            <span class="stat-label">INTELIGÊNCIA</span>
-                            <span class="stat-value" id="intelligenceValue">88%</span>
-                            <div class="stat-bar">
-                                <div class="stat-fill" id="intelligenceBar" style="width: 88%"></div>
+                            <label>AGILIDADE</label>
+                            <div class="bar">
+                                <div class="fill" id="agiBar" style="width: 76%"></div>
+                            </div>
+                            <span id="agiValue">76%</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Área de conteúdo -->
+            <div class="content">
+                <!-- Missões -->
+                <div class="tab-content active" id="missionsTab">
+                    <h2><i class="fas fa-crosshairs"></i> MISSÕES ATIVAS</h2>
+                    <div class="missions" id="missionsList">
+                        <!-- Missões carregadas via JS -->
+                    </div>
+                    <button class="btn btn-primary" id="newMissionBtn">
+                        <i class="fas fa-plus"></i> NOVA MISSÃO
+                    </button>
+                </div>
+
+                <!-- Personagem -->
+                <div class="tab-content" id="characterTab">
+                    <h2><i class="fas fa-user-cog"></i> PERSONAGEM</h2>
+                    <div class="upgrades">
+                        <div class="upgrade-card">
+                            <h3>FORÇA</h3>
+                            <p>Aumenta dano físico</p>
+                            <div class="upgrade-info">
+                                <span>Nível: <strong id="strLvl">7</strong></span>
+                                <button class="btn btn-upgrade" data-stat="str">
+                                    MELHORAR (500cr)
+                                </button>
+                            </div>
+                        </div>
+                        <div class="upgrade-card">
+                            <h3>HACKING</h3>
+                            <p>Habilidade de invasão</p>
+                            <div class="upgrade-info">
+                                <span>Nível: <strong id="hackLvl">9</strong></span>
+                                <button class="btn btn-upgrade" data-stat="hack">
+                                    MELHORAR (750cr)
+                                </button>
+                            </div>
+                        </div>
+                        <div class="upgrade-card">
+                            <h3>AGILIDADE</h3>
+                            <p>Velocidade e esquiva</p>
+                            <div class="upgrade-info">
+                                <span>Nível: <strong id="agiLvl">6</strong></span>
+                                <button class="btn btn-upgrade" data-stat="agi">
+                                    MELHORAR (450cr)
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Missões ativas -->
-                <div class="panel-box">
-                    <h3 class="panel-title">MISSÕES ATIVAS</h3>
-                    <ul class="missions-list" id="missionsList">
-                        <!-- Missões serão carregadas via JavaScript -->
-                    </ul>
-                </div>
-                
-                <!-- Sistema de alerta -->
-                <div class="panel-box">
-                    <h3 class="panel-title">ALERTAS DO SISTEMA</h3>
-                    <div class="alert-system" id="alertsContainer">
-                        <p id="alert1"><i class="fas fa-exclamation-triangle"></i> <span>Novo update disponível</span></p>
-                        <p id="alert2"><i class="fas fa-user-secret"></i> <span>Conexão segura estabelecida</span></p>
-                        <p id="alert3"><i class="fas fa-server"></i> <span>Servidor 03 sob ataque</span></p>
+
+                <!-- Inventário -->
+                <div class="tab-content" id="inventoryTab">
+                    <h2><i class="fas fa-box-open"></i> INVENTÁRIO</h2>
+                    <div class="inventory-grid" id="inventoryGrid">
+                        <!-- Itens carregados via JS -->
+                    </div>
+                    <div class="inventory-controls">
+                        <button class="btn btn-primary" id="buyBtn">
+                            <i class="fas fa-shopping-cart"></i> COMPRAR (1000cr)
+                        </button>
+                        <button class="btn btn-secondary" id="sellBtn">
+                            <i class="fas fa-coins"></i> VENDER (500cr)
+                        </button>
                     </div>
                 </div>
-            </aside>
-            
-            <!-- Área de conteúdo dinâmico -->
-            <div class="content-area" id="missionsContent">
-                <h2 class="content-title">MISSÕES DISPONÍVEIS</h2>
-                <div class="content-grid" id="missionsGrid">
-                    <!-- Missões serão carregadas via JavaScript -->
-                </div>
-            </div>
-            
-            <div class="content-area" id="characterContent">
-                <h2 class="content-title">PERSONAGEM</h2>
-                <div class="content-grid">
-                    <div class="content-card" data-upgrade="strength">
-                        <h3 class="card-title">FORÇA</h3>
-                        <p class="card-desc">Aumenta dano corpo a corpo e capacidade de carga</p>
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                <span>Nível atual</span>
-                                <span id="strengthLevel">7</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 68%"></div>
-                            </div>
+
+                <!-- Mapa -->
+                <div class="tab-content" id="mapTab">
+                    <h2><i class="fas fa-globe-americas"></i> MAPA DA CIDADE</h2>
+                    <div class="map">
+                        <div class="location active" data-loc="downtown">
+                            <h3><i class="fas fa-city"></i> DOWNTOWN</h3>
+                            <p>Centro corporativo</p>
+                            <span>100cr para viajar</span>
                         </div>
-                        <button class="card-button upgrade-btn" data-stat="strength">MELHORAR (500cr)</button>
-                    </div>
-                    <div class="content-card" data-upgrade="hacking">
-                        <h3 class="card-title">HACKING</h3>
-                        <p class="card-desc">Habilidade de invadir sistemas e dispositivos</p>
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                <span>Nível atual</span>
-                                <span id="hackingLevel">9</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 94%"></div>
-                            </div>
+                        <div class="location" data-loc="docks">
+                            <h3><i class="fas fa-ship"></i> DOCKS</h3>
+                            <p>Porto industrial</p>
+                            <span>150cr para viajar</span>
                         </div>
-                        <button class="card-button upgrade-btn" data-stat="hacking">MELHORAR (750cr)</button>
-                    </div>
-                    <div class="content-card" data-upgrade="agility">
-                        <h3 class="card-title">AGILIDADE</h3>
-                        <p class="card-desc">Aumenta velocidade e esquiva de ataques</p>
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                <span>Nível atual</span>
-                                <span id="agilityLevel">6</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 76%"></div>
-                            </div>
-                        </div>
-                        <button class="card-button upgrade-btn" data-stat="agility">MELHORAR (450cr)</button>
-                    </div>
-                    <div class="content-card" data-upgrade="intelligence">
-                        <h3 class="card-title">INTELIGÊNCIA</h3>
-                        <p class="card-desc">Aumenta experiência ganha e habilidades técnicas</p>
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                <span>Nível atual</span>
-                                <span id="intelligenceLevel">8</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 88%"></div>
-                            </div>
-                        </div>
-                        <button class="card-button upgrade-btn" data-stat="intelligence">MELHORAR (600cr)</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="content-area" id="inventoryContent">
-                <h2 class="content-title">INVENTÁRIO</h2>
-                <p>Capacidade: <span id="inventoryCapacity">12/24</span></p>
-                <div class="inventory-grid" id="inventoryGrid">
-                    <!-- Itens serão carregados via JavaScript -->
-                </div>
-                <div style="margin-top: 30px;">
-                    <button class="card-button" id="buyItemBtn">COMPRAR ITEM (1000cr)</button>
-                    <button class="card-button" id="sellItemBtn" style="margin-left: 10px;">VENDER ITEM (500cr)</button>
-                </div>
-            </div>
-            
-            <div class="content-area" id="mapContent">
-                <h2 class="content-title">MAPA DA CIDADE NEON</h2>
-                <div class="map-container">
-                    <div class="map-section">
-                        <h3>LOCAIS DISPONÍVEIS</h3>
-                        <div class="missions-list">
-                            <div class="mission-item" data-location="downtown">
-                                <strong>DOWNTOWN:</strong> Centro da cidade, corporações
-                            </div>
-                            <div class="mission-item" data-location="docks">
-                                <strong>DOCKS:</strong> Porto industrial, contrabando
-                            </div>
-                            <div class="mission-item" data-location="residential">
-                                <strong>RESIDENTIAL:</strong> Área residencial, informações
-                            </div>
-                            <div class="mission-item" data-location="cybercore">
-                                <strong>CYBER-CORE:</strong> Centro de dados, hacking
-                            </div>
+                        <div class="location" data-loc="residential">
+                            <h3><i class="fas fa-home"></i> RESIDENTIAL</h3>
+                            <p>Área residencial</p>
+                            <span>80cr para viajar</span>
                         </div>
                     </div>
-                    <div class="map-section">
-                        <h3>VIAJAR PARA</h3>
-                        <div class="travel-panel">
-                            <p>Selecione um destino para viajar:</p>
-                            <select id="travelSelect">
-                                <option value="downtown">Downtown (100cr)</option>
-                                <option value="docks">Docks (150cr)</option>
-                                <option value="residential">Residential (80cr)</option>
-                                <option value="cybercore">Cyber-Core (200cr)</option>
-                            </select>
-                            <button class="card-button" id="travelBtn">VIAJAR</button>
-                        </div>
-                    </div>
+                    <button class="btn btn-primary" id="travelBtn">
+                        <i class="fas fa-car"></i> VIAJAR
+                    </button>
                 </div>
-            </div>
-            
-            <div class="content-area" id="settingsContent">
-                <h2 class="content-title">CONFIGURAÇÕES DO SISTEMA</h2>
-                <div class="settings-grid">
-                    <div class="settings-card">
-                        <h3><i class="fas fa-volume-up"></i> ÁUDIO</h3>
-                        <div class="setting-option">
-                            <label>Volume Principal</label>
-                            <input type="range" min="0" max="100" value="80" class="slider" id="volumeSlider">
+
+                <!-- Configurações -->
+                <div class="tab-content" id="settingsTab">
+                    <h2><i class="fas fa-sliders-h"></i> CONFIGURAÇÕES</h2>
+                    <div class="settings">
+                        <div class="setting">
+                            <label>Volume</label>
+                            <input type="range" id="volume" min="0" max="100" value="80">
                             <span id="volumeValue">80%</span>
                         </div>
-                        <div class="setting-option">
-                            <label>Efeitos Sonoros</label>
-                            <label class="switch">
-                                <input type="checkbox" checked id="sfxToggle">
-                                <span class="slider-toggle"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="settings-card">
-                        <h3><i class="fas fa-palette"></i> VISUAL</h3>
-                        <div class="setting-option">
-                            <label>Tema de Cores</label>
-                            <select id="themeSelect">
-                                <option value="neon">Neon (Padrão)</option>
-                                <option value="matrix">Matrix Verde</option>
-                                <option value="synthwave">Synthwave</option>
-                                <option value="monochrome">Monocromático</option>
-                            </select>
-                        </div>
-                        <div class="setting-option">
+                        <div class="setting">
                             <label>Efeitos Visuais</label>
                             <label class="switch">
-                                <input type="checkbox" checked id="effectsToggle">
-                                <span class="slider-toggle"></span>
+                                <input type="checkbox" id="effects" checked>
+                                <span class="slider"></span>
                             </label>
                         </div>
-                    </div>
-                    <div class="settings-card">
-                        <h3><i class="fas fa-gamepad"></i> CONTROLES</h3>
-                        <div class="setting-option">
-                            <label>Dificuldade</label>
-                            <select id="difficultySelect">
-                                <option value="easy">Fácil</option>
-                                <option value="normal" selected>Normal</option>
-                                <option value="hard">Difícil</option>
-                                <option value="nightmare">Pesadelo</option>
-                            </select>
+                        <div class="setting">
+                            <label>Salvar Jogo</label>
+                            <button class="btn btn-primary" id="saveBtn">
+                                <i class="fas fa-save"></i> SALVAR
+                            </button>
                         </div>
-                        <div class="setting-option">
-                            <label>Salvamento Automático</label>
-                            <label class="switch">
-                                <input type="checkbox" checked id="autosaveToggle">
-                                <span class="slider-toggle"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="settings-card">
-                        <h3><i class="fas fa-tools"></i> SISTEMA</h3>
-                        <div class="setting-option">
-                            <label>Limpar Dados Salvos</label>
-                            <button class="card-button danger" id="clearDataBtn">LIMPAR</button>
-                        </div>
-                        <div class="setting-option">
-                            <label>Exportar Save</label>
-                            <button class="card-button" id="exportSaveBtn">EXPORTAR</button>
+                        <div class="setting">
+                            <label>Carregar Jogo</label>
+                            <button class="btn btn-secondary" id="loadBtn">
+                                <i class="fas fa-folder-open"></i> CARREGAR
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
-        
+
         <!-- Console -->
-        <section class="console">
+        <div class="console">
             <div class="console-header">
-                <span class="console-title">SISTEMA TERMINAL v2.4.7</span>
-                <button class="console-clear" id="clearConsoleBtn"><i class="fas fa-trash"></i> LIMPAR</button>
+                <span>TERMINAL</span>
+                <button id="clearConsole" class="btn-small">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-            <div class="console-output" id="consoleOutput">
-                <!-- Mensagens do console aparecerão aqui -->
+            <div class="console-output" id="console">
+                <!-- Mensagens do console -->
+                <div class="log system">Sistema: Inicializando NEON DASH...</div>
+                <div class="log system">Sistema: Bem-vindo, Operador</div>
             </div>
-            <div class="console-input-area">
-                <span class="console-prompt">></span>
-                <input type="text" class="console-input" id="consoleInput" placeholder="Digite um comando (help para ajuda)...">
+            <div class="console-input">
+                <span>></span>
+                <input type="text" id="commandInput" placeholder="Digite um comando...">
             </div>
-        </section>
-        
-        <!-- Rodapé -->
-        <footer class="footer">
-            <div class="copyright">
-                &copy; 2078 NEON CORP. Todos os direitos reservados.
-            </div>
-            <div class="footer-links">
-                <button class="footer-link" id="saveGameBtn">Salvar Jogo</button>
-                <button class="footer-link" id="loadGameBtn">Carregar Jogo</button>
-                <button class="footer-link" id="helpBtn">Ajuda</button>
-                <button class="footer-link" id="aboutBtn">Sobre</button>
-            </div>
-            <div class="version">
-                v2.4.7 | BUILD 7842 | <span id="gameTime">00:00:00</span>
-            </div>
-        </footer>
+        </div>
     </div>
 
     <script src="script.js"></script>
