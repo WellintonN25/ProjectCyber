@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON DASH - Cyberpunk 2078</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Orbitron', monospace;
+        }
+
+        :root {
+            --neon-blue: #0ff0fc;
+            --neon-pink: #ff00ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff9d;
+            --neon-yellow: #ffff00;
+            --dark-bg: #0a0a14;
+            --darker-bg: #050508;
+            --grid-color: rgba(0, 255, 255, 0.1);
+            --text-glow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+        }
+
+        body {
+            background-color: var(--darker-bg);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            position: relative;
+        }
+
+        /* Efeitos de partículas */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: var(--neon-blue);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-100vh) translateX(100px); }
+        }
+
+        /* Scanline effect */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--neon-blue), transparent);
+            box-shadow: 0 0 10px var(--neon-blue);
+            animation: scan 3s linear infinite;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--neon-blue);
+            margin-bottom: 40px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: var(--text-glow);
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-item {
+            padding: 5px 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 3px;
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 5px var(--neon-blue);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .status-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .status-item i {
+            margin-right: 8px;
+            color: var(--neon-pink);
+        }
+
+        /* Conteúdo principal */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+            min-height: 500px;
+        }
+
+        /* Menu principal */
+        .main-menu {
+            background: rgba(10, 10, 20, 0.8);
+            border: 2px solid var(--neon-blue);
+            border-radius: 5px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .menu-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-title i {
+            margin-right: 15px;
+            color: var(--neon-pink);
+        }
+
+        .menu-options {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateX(10px);
+        }
+
+        .menu-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid transparent;
+            border-left: 5px solid var(--neon-blue);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn:hover {
+            background: rgba(15, 240, 252, 0.1);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            color: var(--neon-blue);
+        }
+
+        .menu-btn i {
+            margin-right: 15px;
+            width: 25px;
+        }
+
+        .menu-btn.active {
+            background: rgba(15, 240, 252, 0.15);
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+
+        /* Painel lateral */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .panel-box {
+            background: rgba(10, 10, 20, 0.8);
+            border: 2px solid var(--neon-purple);
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(157, 0, 255, 0.3);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--neon-pink);
+            border-bottom: 1px solid var(--neon-purple);
+            padding-bottom: 5px;
+        }
+
+        .player-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            color: var(--neon-blue);
+        }
+
+        .stat-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .missions-list {
+            list-style: none;
+        }
+
+        .mission-item {
+            padding: 10px;
+            border-left: 3px solid var(--neon-blue);
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mission-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .mission-item.completed {
+            border-color: var(--neon-green);
+            opacity: 0.7;
+        }
+
+        .mission-item.active {
+            border-color: var(--neon-yellow);
+            background: rgba(255, 255, 0, 0.1);
+        }
+
+        /* Área de conteúdo dinâmico */
+        .content-area {
+            grid-column: 1 / -1;
+            background: rgba(10, 10, 20, 0.9);
+            border: 2px solid var(--neon-pink);
+            border-radius: 5px;
+            padding: 30px;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-title {
+            font-size: 1.8rem;
+            color: var(--neon-pink);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--neon-purple);
+            padding-bottom: 10px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .content-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-blue);
+            border-radius: 5px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .card-button {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .card-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Sistema de inventário */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .inventory-slot {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-blue);
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .inventory-slot:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .inventory-slot.empty {
+            border-color: #666;
+            opacity: 0.5;
+        }
+
+        .inventory-slot.empty:hover {
+            border-color: var(--neon-blue);
+            opacity: 1;
+        }
+
+        .slot-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .slot-name {
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        /* Console */
+        .console {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--neon-blue);
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 30px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .console-line {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .console-prompt {
+            color: var(--neon-blue);
+        }
+
+        .console-text {
+            color: var(--neon-green);
+        }
+
+        .console-warning {
+            color: var(--neon-yellow);
+        }
+
+        .console-error {
+            color: #ff0000;
+        }
+
+        .console-input {
+            background: transparent;
+            border: none;
+            color: var(--neon-green);
+            font-family: monospace;
+            font-size: 0.9rem;
+            width: calc(100% - 60px);
+            outline: none;
+            caret-color: var(--neon-blue);
+        }
+
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-top: 1px solid var(--neon-blue);
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-link {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: var(--neon-blue);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--darker-bg);
+            border: 3px solid var(--neon-pink);
+            border-radius: 5px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.5);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--neon-pink);
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid #666;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Efeitos de glitch */
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--neon-pink);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--neon-blue);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(20px, 9999px, 45px, 0); }
+            5% { clip: rect(85px, 9999px, 120px, 0); }
+            10% { clip: rect(65px, 9999px, 90px, 0); }
+            15% { clip: rect(40px, 9999px, 75px, 0); }
+            20% { clip: rect(60px, 9999px, 100px, 0); }
+            100% { clip: rect(90px, 9999px, 150px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(100px, 9999px, 130px, 0); }
+            5% { clip: rect(30px, 9999px, 80px, 0); }
+            10% { clip: rect(70px, 9999px, 110px, 0); }
+            15% { clip: rect(50px, 9999px, 95px, 0); }
+            20% { clip: rect(80px, 9999px, 120px, 0); }
+            100% { clip: rect(40px, 9999px, 85px, 0); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .status-bar {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .footer {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Efeito de scanline -->
+    <div class="scanline"></div>
+    
+    <!-- Partículas flutuantes -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Modal de confirmação -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">CONFIRMAR AÇÃO</h2>
+            <p id="modalMessage">Você tem certeza que deseja executar esta ação?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="modalCancel">CANCELAR</button>
+                <button class="modal-btn confirm" id="modalConfirm">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Cabeçalho -->
+        <header class="header">
+            <h1 class="logo glitch" data-text="NEON DASH" id="mainLogo">NEON DASH</h1>
+            <div class="status-bar">
+                <div class="status-item" id="creditsBtn">
+                    <i class="fas fa-coins"></i> CREDITS: <span id="creditsValue">12,450</span>
+                </div>
+                <div class="status-item" id="levelBtn">
+                    <i class="fas fa-shield-alt"></i> LEVEL: <span id="levelValue">24</span>
+                </div>
+                <div class="status-item" id="healthBtn">
+                    <i class="fas fa-heart"></i> HP: <span id="healthValue">85%</span>
+                </div>
+                <div class="status-item" id="energyBtn">
+                    <i class="fas fa-bolt"></i> ENERGY: <span id="energyValue">72%</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Conteúdo principal -->
+        <main class="main-content">
+            <!-- Menu principal -->
+            <section class="main-menu">
+                <h2 class="menu-title">
+                    <i class="fas fa-gamepad"></i> MENU PRINCIPAL
+                </h2>
+                
+                <ul class="menu-options">
+                    <li class="menu-item">
+                        <button class="menu-btn active" data-content="missions">
+                            <i class="fas fa-play"></i> INICIAR MISSÃO
+                        </button>
+                    </li>
+                    <li class="menu-item">
+                        <button class="menu-btn" data-content="character">
+                            <i class="fas fa-user-ninja"></i> PERSONAGEM
+                        </button>
+                    </li>
+                    <li class="menu-item">
+                        <button class="menu-btn" data-content="inventory">
+                            <i class="fas fa-cogs"></i> EQUIPAMENTOS
+                        </button>
+                    </li>
+                    <li class="menu-item">
+                        <button class="menu-btn" data-content="map">
+                            <i class="fas fa-map-marked-alt"></i> MAPA DA CIDADE
+                        </button>
+                    </li>
+                    <li class="menu-item">
+                        <button class="menu-btn" data-content="files">
+                            <i class="fas fa-database"></i> ARQUIVOS
+                        </button>
+                    </li>
+                    <li class="menu-item">
+                        <button class="menu-btn" data-content="settings">
+                            <i class="fas fa-sliders-h"></i> CONFIGURAÇÕES
+                        </button>
+                    </li>
+                    <li class="menu-item">
+                        <button class="menu-btn" id="logoutBtn">
+                            <i class="fas fa-power-off"></i> SAIR DO SISTEMA
+                        </button>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Painel lateral -->
+            <aside class="side-panel">
+                <!-- Status do jogador -->
+                <div class="panel-box">
+                    <h3 class="panel-title">STATUS DO OPERADOR</h3>
+                    <div class="player-stats">
+                        <div class="stat">
+                            <span class="stat-label">FORÇA</span>
+                            <span class="stat-value" id="strengthValue">68%</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" id="strengthBar" style="width: 68%"></div>
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">HACKING</span>
+                            <span class="stat-value" id="hackingValue">94%</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" id="hackingBar" style="width: 94%"></div>
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">AGILIDADE</span>
+                            <span class="stat-value" id="agilityValue">76%</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" id="agilityBar" style="width: 76%"></div>
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">INTELIGÊNCIA</span>
+                            <span class="stat-value" id="intelligenceValue">88%</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" id="intelligenceBar" style="width: 88%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Missões ativas -->
+                <div class="panel-box">
+                    <h3 class="panel-title">MISSÕES ATIVAS</h3>
+                    <ul class="missions-list" id="missionsList">
+                        <!-- Missões serão carregadas via JavaScript -->
+                    </ul>
+                </div>
+                
+                <!-- Sistema de alerta -->
+                <div class="panel-box">
+                    <h3 class="panel-title">ALERTAS DO SISTEMA</h3>
+                    <div class="alert-system" id="alertsContainer">
+                        <p id="alert1"><i class="fas fa-exclamation-triangle"></i> <span>Novo update disponível</span></p>
+                        <p id="alert2"><i class="fas fa-user-secret"></i> <span>Conexão segura estabelecida</span></p>
+                        <p id="alert3"><i class="fas fa-server"></i> <span>Servidor 03 sob ataque</span></p>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Área de conteúdo dinâmico -->
+            <div class="content-area" id="missionsContent">
+                <h2 class="content-title">MISSÕES DISPONÍVEIS</h2>
+                <div class="content-grid" id="missionsGrid">
+                    <!-- Missões serão carregadas via JavaScript -->
+                </div>
+            </div>
+            
+            <div class="content-area" id="characterContent">
+                <h2 class="content-title">PERSONAGEM</h2>
+                <div class="content-grid">
+                    <div class="content-card" data-upgrade="strength">
+                        <h3 class="card-title">FORÇA</h3>
+                        <p class="card-desc">Aumenta dano corpo a corpo e capacidade de carga</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Nível atual</span>
+                                <span id="strengthLevel">7</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 68%"></div>
+                            </div>
+                        </div>
+                        <button class="card-button upgrade-btn" data-stat="strength">MELHORAR (500cr)</button>
+                    </div>
+                    <div class="content-card" data-upgrade="hacking">
+                        <h3 class="card-title">HACKING</h3>
+                        <p class="card-desc">Habilidade de invadir sistemas e dispositivos</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Nível atual</span>
+                                <span id="hackingLevel">9</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 94%"></div>
+                            </div>
+                        </div>
+                        <button class="card-button upgrade-btn" data-stat="hacking">MELHORAR (750cr)</button>
+                    </div>
+                    <div class="content-card" data-upgrade="agility">
+                        <h3 class="card-title">AGILIDADE</h3>
+                        <p class="card-desc">Aumenta velocidade e esquiva de ataques</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Nível atual</span>
+                                <span id="agilityLevel">6</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 76%"></div>
+                            </div>
+                        </div>
+                        <button class="card-button upgrade-btn" data-stat="agility">MELHORAR (450cr)</button>
+                    </div>
+                    <div class="content-card" data-upgrade="intelligence">
+                        <h3 class="card-title">INTELIGÊNCIA</h3>
+                        <p class="card-desc">Aumenta experiência ganha e habilidades técnicas</p>
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Nível atual</span>
+                                <span id="intelligenceLevel">8</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <button class="card-button upgrade-btn" data-stat="intelligence">MELHORAR (600cr)</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-area" id="inventoryContent">
+                <h2 class="content-title">INVENTÁRIO</h2>
+                <p>Capacidade: <span id="inventoryCapacity">12/24</span></p>
+                <div class="inventory-grid" id="inventoryGrid">
+                    <!-- Itens serão carregados via JavaScript -->
+                </div>
+                <div style="margin-top: 30px;">
+                    <button class="card-button" id="buyItemBtn">COMPRAR ITEM (1000cr)</button>
+                    <button class="card-button" id="sellItemBtn" style="background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple)); margin-left: 10px;">VENDER ITEM (500cr)</button>
+                </div>
+            </div>
+            
+            <div class="content-area" id="mapContent">
+                <h2 class="content-title">MAPA DA CIDADE NEON</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                    <div>
+                        <h3 style="color: var(--neon-blue); margin-bottom: 15px;">LOCAIS DISPONÍVEIS</h3>
+                        <div class="missions-list">
+                            <div class="mission-item" data-location="downtown">
+                                <strong>DOWNTOWN:</strong> Centro da cidade, corporações
+                            </div>
+                            <div class="mission-item" data-location="docks">
+                                <strong>DOCKS:</strong> Porto industrial, contrabando
+                            </div>
+                            <div class="mission-item" data-location="residential">
+                                <strong>RESIDENTIAL:</strong> Área residencial, informações
+                            </div>
+                            <div class="mission-item" data-location="cybercore">
+                                <strong>CYBER-CORE:</strong> Centro de dados, hacking
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--neon-blue); margin-bottom: 15px;">VIAJAR PARA</h3>
+                        <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 5px; border: 1px solid var(--neon-blue);">
+                            <p style="margin-bottom: 15px;">Selecione um destino para viajar:</p>
+                            <select id="travelSelect" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.7); color: white; border: 1px solid var(--neon-blue); border-radius: 3px; margin-bottom: 15px;">
+                                <option value="downtown">Downtown (100cr)</option>
+                                <option value="docks">Docks (150cr)</option>
+                                <option value="residential">Residential (80cr)</option>
+                                <option value="cybercore">Cyber-Core (200cr)</option>
+                            </select>
+                            <button class="card-button" id="travelBtn">VIAJAR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Console -->
+        <section class="console">
+            <div class="console-line">
+                <span class="console-prompt">SYSTEM></span> <span class="console-text">Inicializando NEON DASH v2.4.7...</span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">SYSTEM></span> <span class="console-text">Carregando módulos de segurança...</span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">SYSTEM></span> <span class="console-text">Conexão estabelecida com CYBER-CORE</span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">SYSTEM></span> <span class="console-warning">ALERTA: Atividade suspeita detectada no setor 7</span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">SYSTEM></span> <span class="console-text">Sistema de missões carregado. 4 missões disponíveis.</span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">USER></span> <span class="console-text">Olá, NEXUS_ONE. Pronto para a próxima missão?</span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">SYSTEM></span> <span class="console-text">Digite 'help' para comandos disponíveis</span>
+            </div>
+            <div class="console-line" id="consoleInputLine">
+                <span class="console-prompt">></span>
+                <input type="text" class="console-input" id="consoleInput" placeholder="Digite um comando...">
+            </div>
+        </section>
+        
+        <!-- Rodapé -->
+        <footer class="footer">
+            <div class="copyright">
+                &copy; 2078 NEON CORP. Todos os direitos reservados.
+            </div>
+            <div class="footer-links">
+                <a class="footer-link" id="saveGameBtn">Salvar Jogo</a>
+                <a class="footer-link" id="loadGameBtn">Carregar Jogo</a>
+                <a class="footer-link" id="helpBtn">Ajuda</a>
+                <a class="footer-link" id="aboutBtn">Sobre</a>
+            </div>
+            <div class="version">
+                v2.4.7 | BUILD 7842
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Dados do jogo
+        const gameState = {
+            credits: 12450,
+            level: 24,
+            health: 85,
+            energy: 72,
+            strength: { value: 68, level: 7 },
+            hacking: { value: 94, level: 9 },
+            agility: { value: 76, level: 6 },
+            intelligence: { value: 88, level: 8 },
+            inventory: [
+                { id: 1, name: "Pistola Laser", type: "weapon", icon: "fas fa-gun" },
+                { id: 2, name: "Armadura", type: "armor", icon: "fas fa-shield-alt" },
+                { id: 3, name: "Kit Médico", type: "health", icon: "fas fa-first-aid" },
+                { id: 4, name: "Hack Tool", type: "tool", icon: "fas fa-screwdriver-wrench" },
+                { id: 5, name: "Energia", type: "energy", icon: "fas fa-battery-full" },
+                { id: 6, name: "Dados", type: "data", icon: "fas fa-database" },
+                { id: 7, name: "Chave", type: "key", icon: "fas fa-key" },
+                { id: 8, name: "Chip", type: "chip", icon: "fas fa-microchip" },
+                { id: 9, name: "Óculos", type: "vision", icon: "fas fa-glasses" },
+                { id: 10, name: "Comms", type: "comms", icon: "fas fa-walkie-talkie" },
+                { id: 11, name: "Munição", type: "ammo", icon: "fas fa-bullseye" },
+                { id: 12, name: "Dinheiro", type: "money", icon: "fas fa-money-bill-wave" }
+            ],
+            missions: [
+                { id: 1, name: "Infiltrar a corporação", description: "Entre na corporação sem ser detectado", reward: 1500, completed: true, active: false },
+                { id: 2, name: "Roubar dados confidenciais", description: "Acesse o servidor principal e copie os dados", reward: 2500, completed: false, active: true },
+                { id: 3, name: "Desativar sistema de segurança", description: "Encontre e desative o sistema de segurança do prédio", reward: 1800, completed: false, active: false },
+                { id: 4, name: "Encontrar o informante", description: "Encontre o informante no setor 7 para obter informações", reward: 1200, completed: false, active: false },
+                { id: 5, name: "Hackear terminal principal", description: "Use suas habilidades de hacking para acessar o terminal", reward: 3000, completed: false, active: false },
+                { id: 6, name: "Eliminar guardas", description: "Neutralize os guardas da área sem alertar reforços", reward: 2000, completed: false, active: false }
+            ],
+            currentLocation: "downtown",
+            alerts: [
+                { id: 1, text: "Novo update disponível", type: "warning", active: true },
+                { id: 2, text: "Conexão segura estabelecida", type: "success", active: true },
+                { id: 3, text: "Servidor 03 sob ataque", type: "error", active: true }
+            ]
+        };
+
+        // Elementos DOM
+        const elements = {
+            creditsValue: document.getElementById('creditsValue'),
+            levelValue: document.getElementById('levelValue'),
+            healthValue: document.getElementById('healthValue'),
+            energyValue: document.getElementById('energyValue'),
+            strengthValue: document.getElementById('strengthValue'),
+            hackingValue: document.getElementById('hackingValue'),
+            agilityValue: document.getElementById('agilityValue'),
+            intelligenceValue: document.getElementById('intelligenceValue'),
+            strengthBar: document.getElementById('strengthBar'),
+            hackingBar: document.getElementById('hackingBar'),
+            agilityBar: document.getElementById('agilityBar'),
+            intelligenceBar: document.getElementById('intelligenceBar'),
+            missionsList: document.getElementById('missionsList'),
+            missionsGrid: document.getElementById('missionsGrid'),
+            inventoryGrid: document.getElementById('inventoryGrid'),
+            alertsContainer: document.getElementById('alertsContainer'),
+            consoleInput: document.getElementById('consoleInput'),
+            contentAreas: document.querySelectorAll('.content-area'),
+            menuButtons: document.querySelectorAll('.menu-btn'),
+            modal: document.getElementById('confirmationModal'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalMessage: document.getElementById('modalMessage'),
+            modalConfirm: document.getElementById('modalConfirm'),
+            modalCancel: document.getElementById('modalCancel')
+        };
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            setupMenuButtons();
+            updateGameUI();
+            setupMissionList();
+            setupMissionsGrid();
+            setupInventory();
+            setupAlerts();
+            setupConsole();
+            setupEventListeners();
+            setupModal();
+            updateStatusBars();
+            
+            // Inicializar com a área de missões visível
+            showContentArea('missions');
+        });
+
+        // Criar partículas flutuantes
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 4 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                const colors = ['#0ff0fc', '#ff00ff', '#9d00ff', '#00ff9d'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.backgroundColor = color;
+                
+                const duration = Math.random() * 30 + 20;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Configurar botões do menu
+        function setupMenuButtons() {
+            elements.menuButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Se for botão de logout, mostrar modal
+                    if (this.id === 'logoutBtn') {
+                        showModal("SAIR DO SISTEMA", "Você tem certeza que deseja sair do sistema?", () => {
+                            addConsoleMessage("Saindo do sistema...");
+                            setTimeout(() => {
+                                document.body.innerHTML = `
+                                    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; color: #0ff0fc; font-family: monospace; font-size: 2rem;">
+                                        <div style="text-align: center;">
+                                            <div style="margin-bottom: 20px;">SYSTEM OFFLINE</div>
+                                            <div style="font-size: 1rem; color: #aaa;">Reconectando em 3... 2... 1...</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }, 1000);
+                        });
+                        return;
+                    }
+
+                    // Para outros botões, mostrar conteúdo correspondente
+                    elements.menuButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const contentId = this.getAttribute('data-content');
+                    showContentArea(contentId);
+                    
+                    addConsoleMessage(`Acessando ${this.textContent.trim()}...`);
+                    
+                    // Efeito visual
+                    const menuItem = this.parentElement;
+                    menuItem.style.transform = 'translateX(10px)';
+                    setTimeout(() => {
+                        menuItem.style.transform = 'translateX(0)';
+                    }, 300);
+                });
+            });
+        }
+
+        // Mostrar área de conteúdo
+        function showContentArea(contentId) {
+            elements.contentAreas.forEach(area => {
+                area.classList.remove('active');
+            });
+            
+            const targetArea = document.getElementById(`${contentId}Content`);
+            if (targetArea) {
+                targetArea.classList.add('active');
+            }
+        }
+
+        // Atualizar interface do jogo
+        function updateGameUI() {
+            elements.creditsValue.textContent = gameState.credits.toLocaleString();
+            elements.levelValue.textContent = gameState.level;
+            elements.healthValue.textContent = `${gameState.health}%`;
+            elements.energyValue.textContent = `${gameState.energy}%`;
+            
+            // Atualizar estatísticas
+            elements.strengthValue.textContent = `${gameState.strength.value}%`;
+            elements.hackingValue.textContent = `${gameState.hacking.value}%`;
+            elements.agilityValue.textContent = `${gameState.agility.value}%`;
+            elements.intelligenceValue.textContent = `${gameState.intelligence.value}%`;
+            
+            // Atualizar níveis nas cartas de personagem
+            document.getElementById('strengthLevel').textContent = gameState.strength.level;
+            document.getElementById('hackingLevel').textContent = gameState.hacking.level;
+            document.getElementById('agilityLevel').textContent = gameState.agility.level;
+            document.getElementById('intelligenceLevel').textContent = gameState.intelligence.level;
+            
+            // Atualizar capacidade do inventário
+            document.getElementById('inventoryCapacity').textContent = `${gameState.inventory.length}/24`;
+        }
+
+        // Atualizar barras de status
+        function updateStatusBars() {
+            elements.strengthBar.style.width = `${gameState.strength.value}%`;
+            elements.hackingBar.style.width = `${gameState.hacking.value}%`;
+            elements.agilityBar.style.width = `${gameState.agility.value}%`;
+            elements.intelligenceBar.style.width = `${gameState.intelligence.value}%`;
+            
+            // Atualizar barras de progresso nas cartas
+            document.querySelectorAll('.progress-fill').forEach((bar, index) => {
+                const stats = [gameState.strength, gameState.hacking, gameState.agility, gameState.intelligence];
+                if (stats[index]) {
+                    bar.style.width = `${stats[index].value}%`;
+                }
+            });
+        }
+
+        // Configurar lista de missões
+        function setupMissionList() {
+            elements.missionsList.innerHTML = '';
+            
+            gameState.missions.forEach(mission => {
+                if (mission.completed || mission.active) {
+                    const li = document.createElement('li');
+                    li.className = `mission-item ${mission.completed ? 'completed' : ''} ${mission.active ? 'active' : ''}`;
+                    li.innerHTML = `<strong>MISSÃO ${mission.id}:</strong> ${mission.name}`;
+                    li.addEventListener('click', () => selectMission(mission));
+                    elements.missionsList.appendChild(li);
+                }
+            });
+        }
+
+        // Configurar grid de missões
+        function setupMissionsGrid() {
+            elements.missionsGrid.innerHTML = '';
+            
+            gameState.missions.forEach(mission => {
+                if (!mission.completed) {
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    card.innerHTML = `
+                        <h3 class="card-title">${mission.name}</h3>
+                        <p class="card-desc">${mission.description}</p>
+                        <p style="color: var(--neon-yellow); margin: 10px 0;">Recompensa: ${mission.reward}cr</p>
+                        <button class="card-button mission-start-btn" data-mission-id="${mission.id}">
+                            ${mission.active ? 'CONTINUAR MISSÃO' : 'INICIAR MISSÃO'}
+                        </button>
+                    `;
+                    elements.missionsGrid.appendChild(card);
+                }
+            });
+            
+            // Adicionar eventos aos botões de missão
+            document.querySelectorAll('.mission-start-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const missionId = parseInt(this.getAttribute('data-mission-id'));
+                    startMission(missionId);
+                });
+            });
+        }
+
+        // Selecionar missão
+        function selectMission(mission) {
+            // Remover active de todas as missões
+            gameState.missions.forEach(m => m.active = false);
+            // Definir esta como ativa
+            mission.active = true;
+            
+            // Atualizar UI
+            setupMissionList();
+            setupMissionsGrid();
+            
+            addConsoleMessage(`Missão "${mission.name}" selecionada.`);
+        }
+
+        // Iniciar missão
+        function startMission(missionId) {
+            const mission = gameState.missions.find(m => m.id === missionId);
+            if (!mission) return;
+            
+            showModal("INICIAR MISSÃO", `Iniciar missão "${mission.name}"? Recompensa: ${mission.reward}cr`, () => {
+                // Simular progresso da missão
+                addConsoleMessage(`Iniciando missão: ${mission.name}`);
+                addConsoleMessage("Infiltração em andamento...");
+                
+                // Atualizar estado da missão
+                mission.active = true;
+                selectMission(mission);
+                
+                // Simular conclusão após 3 segundos
+                setTimeout(() => {
+                    mission.completed = true;
+                    mission.active = false;
+                    gameState.credits += mission.reward;
+                    
+                    // Atualizar UI
+                    updateGameUI();
+                    setupMissionList();
+                    setupMissionsGrid();
+                    
+                    addConsoleMessage(`MISSÃO CONCLUÍDA! Recompensa: ${mission.reward}cr recebidos.`);
+                    addConsoleMessage(`Créditos totais: ${gameState.credits}cr`);
+                    
+                    // Adicionar alerta
+                    gameState.alerts.push({
+                        id: gameState.alerts.length + 1,
+                        text: `Missão "${mission.name}" concluída`,
+                        type: "success",
+                        active: true
+                    });
+                    setupAlerts();
+                    
+                }, 3000);
+            });
+        }
+
+        // Configurar inventário
+        function setupInventory() {
+            elements.inventoryGrid.innerHTML = '';
+            
+            // Adicionar slots ocupados
+            gameState.inventory.forEach(item => {
+                const slot = document.createElement('div');
+                slot.className = 'inventory-slot';
+                slot.innerHTML = `
+                    <div class="slot-icon"><i class="${item.icon}"></i></div>
+                    <div class="slot-name">${item.name}</div>
+                `;
+                slot.addEventListener('click', () => selectInventoryItem(item));
+                elements.inventoryGrid.appendChild(slot);
+            });
+            
+            // Adicionar slots vazios
+            const emptySlots = 24 - gameState.inventory.length;
+            for (let i = 0; i < emptySlots; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'inventory-slot empty';
+                slot.innerHTML = `
+                    <div class="slot-icon"><i class="fas fa-plus"></i></div>
+                    <div class="slot-name">VAZIO</div>
+                `;
+                slot.addEventListener('click', () => {
+                    addConsoleMessage("Slot vazio. Compre um item para preencher.");
+                });
+                elements.inventoryGrid.appendChild(slot);
+            }
+        }
+
+        // Selecionar item do inventário
+        function selectInventoryItem(item) {
+            addConsoleMessage(`Item selecionado: ${item.name} (${item.type})`);
+        }
+
+        // Configurar alertas
+        function setupAlerts() {
+            const container = elements.alertsContainer;
+            container.innerHTML = '';
+            
+            gameState.alerts.forEach(alert => {
+                if (alert.active) {
+                    const p = document.createElement('p');
+                    let icon = 'fas fa-info-circle';
+                    let color = '#0ff0fc';
+                    
+                    switch(alert.type) {
+                        case 'warning': icon = 'fas fa-exclamation-triangle'; color = '#ffff00'; break;
+                        case 'error': icon = 'fas fa-times-circle'; color = '#ff0000'; break;
+                        case 'success': icon = 'fas fa-check-circle'; color = '#00ff00'; break;
+                    }
+                    
+                    p.innerHTML = `<i class="${icon}" style="color: ${color};"></i> <span>${alert.text}</span>`;
+                    p.style.cursor = 'pointer';
+                    p.addEventListener('click', () => {
+                        alert.active = false;
+                        setupAlerts();
+                    });
+                    container.appendChild(p);
+                }
+            });
+        }
+
+        // Configurar console
+        function setupConsole() {
+            elements.consoleInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const command = this.value.trim().toLowerCase();
+                    this.value = '';
+                    
+                    if (command) {
+                        addConsoleMessage(`> ${command}`, 'user');
+                        processCommand(command);
+                    }
+                }
+            });
+        }
+
+        // Processar comandos do console
+        function processCommand(command) {
+            const console = document.querySelector('.console');
+            
+            switch(command) {
+                case 'help':
+                    addConsoleMessage("Comandos disponíveis:", 'system');
+                    addConsoleMessage("  help - Mostra esta ajuda", 'system');
+                    addConsoleMessage("  credits - Mostra créditos atuais", 'system');
+                    addConsoleMessage("  missions - Lista missões disponíveis", 'system');
+                    addConsoleMessage("  inventory - Lista itens do inventário", 'system');
+                    addConsoleMessage("  clear - Limpa o console", 'system');
+                    break;
+                    
+                case 'credits':
+                    addConsoleMessage(`Créditos atuais: ${gameState.credits}cr`, 'system');
+                    break;
+                    
+                case 'missions':
+                    addConsoleMessage("Missões disponíveis:", 'system');
+                    gameState.missions.forEach(mission => {
+                        if (!mission.completed) {
+                            addConsoleMessage(`  ${mission.id}: ${mission.name} (${mission.reward}cr)`, 'system');
+                        }
+                    });
+                    break;
+                    
+                case 'inventory':
+                    addConsoleMessage(`Itens no inventário: ${gameState.inventory.length}/24`, 'system');
+                    gameState.inventory.forEach(item => {
+                        addConsoleMessage(`  ${item.name} (${item.type})`, 'system');
+                    });
+                    break;
+                    
+                case 'clear':
+                    const lines = console.querySelectorAll('.console-line');
+                    lines.forEach(line => {
+                        if (!line.id === 'consoleInputLine') {
+                            line.remove();
+                        }
+                    });
+                    break;
+                    
+                default:
+                    addConsoleMessage(`Comando "${command}" não reconhecido. Digite "help" para ajuda.`, 'error');
+            }
+        }
+
+        // Adicionar mensagem ao console
+        function addConsoleMessage(message, type = 'system') {
+            const console = document.querySelector('.console');
+            const newLine = document.createElement('div');
+            newLine.classList.add('console-line');
+            
+            let prompt = 'SYSTEM>';
+            let textClass = 'console-text';
+            
+            switch(type) {
+                case 'user': prompt = 'USER>'; textClass = 'console-text'; break;
+                case 'error': prompt = 'ERROR>'; textClass = 'console-error'; break;
+                case 'warning': prompt = 'WARNING>'; textClass = 'console-warning'; break;
+            }
+            
+            newLine.innerHTML = `<span class="console-prompt">${prompt}</span> <span class="${textClass}">${message}</span>`;
+            
+            // Inserir antes da linha de input
+            const inputLine = document.getElementById('consoleInputLine');
+            console.insertBefore(newLine, inputLine);
+            
+            // Rolar para baixo
+            console.scrollTop = console.scrollHeight;
+        }
+
+        // Configurar eventos
+        function setupEventListeners() {
+            // Botões de upgrade
+            document.querySelectorAll('.upgrade-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const stat = this.getAttribute('data-stat');
+                    const cost = parseInt(this.textContent.match(/\((\d+)cr\)/)[1]);
+                    
+                    if (gameState.credits >= cost) {
+                        showModal("MELHORAR ATRIBUTO", `Melhorar ${stat} por ${cost}cr?`, () => {
+                            upgradeStat(stat, cost);
+                        });
+                    } else {
+                        addConsoleMessage(`Créditos insuficientes. Necessário: ${cost}cr, Disponível: ${gameState.credits}cr`, 'error');
+                    }
+                });
+            });
+            
+            // Botão de comprar item
+            document.getElementById('buyItemBtn').addEventListener('click', () => {
+                if (gameState.credits >= 1000) {
+                    if (gameState.inventory.length < 24) {
+                        showModal("COMPRAR ITEM", "Comprar item aleatório por 1000cr?", () => {
+                            buyItem();
+                        });
+                    } else {
+                        addConsoleMessage("Inventário cheio! Venda itens antes de comprar novos.", 'error');
+                    }
+                } else {
+                    addConsoleMessage("Créditos insuficientes para comprar item.", 'error');
+                }
+            });
+            
+            // Botão de vender item
+            document.getElementById('sellItemBtn').addEventListener('click', () => {
+                if (gameState.inventory.length > 0) {
+                    showModal("VENDER ITEM", "Vender item aleatório por 500cr?", () => {
+                        sellItem();
+                    });
+                } else {
+                    addConsoleMessage("Inventário vazio! Compre itens primeiro.", 'error');
+                }
+            });
+            
+            // Botão de viajar
+            document.getElementById('travelBtn').addEventListener('click', () => {
+                const select = document.getElementById('travelSelect');
+                const location = select.value;
+                const cost = parseInt(select.options[select.selectedIndex].text.match(/\((\d+)cr\)/)[1]);
+                
+                if (gameState.credits >= cost) {
+                    showModal("VIAJAR", `Viajar para ${location} por ${cost}cr?`, () => {
+                        travelTo(location, cost);
+                    });
+                } else {
+                    addConsoleMessage(`Créditos insuficientes para viajar. Necessário: ${cost}cr`, 'error');
+                }
+            });
+            
+            // Botões do rodapé
+            document.getElementById('saveGameBtn').addEventListener('click', () => {
+                saveGame();
+            });
+            
+            document.getElementById('loadGameBtn').addEventListener('click', () => {
+                loadGame();
+            });
+            
+            document.getElementById('helpBtn').addEventListener('click', () => {
+                showModal("AJUDA", "Use os botões do menu para navegar. Clique nos itens para interagir. Use o console para comandos extras.", null, false);
+            });
+            
+            document.getElementById('aboutBtn').addEventListener('click', () => {
+                showModal("SOBRE", "NEON DASH v2.4.7\nUm jogo cyberpunk interativo\nDesenvolvido com HTML, CSS e JavaScript\n© 2078 NEON CORP", null, false);
+            });
+            
+            // Botões de status (header)
+            document.getElementById('creditsBtn').addEventListener('click', () => {
+                addConsoleMessage(`Créditos: ${gameState.credits}cr | Level: ${gameState.level} | Saúde: ${gameState.health}% | Energia: ${gameState.energy}%`, 'system');
+            });
+            
+            document.getElementById('levelBtn').addEventListener('click', () => {
+                const xpNeeded = gameState.level * 1000;
+                addConsoleMessage(`Level ${gameState.level} | XP para próximo nível: ${xpNeeded}`, 'system');
+            });
+            
+            document.getElementById('healthBtn').addEventListener('click', () => {
+                addConsoleMessage(`Saúde: ${gameState.health}% - ${gameState.health > 50 ? 'Estável' : 'Crítico'}`, 
+                                gameState.health > 50 ? 'system' : 'warning');
+            });
+            
+            document.getElementById('energyBtn').addEventListener('click', () => {
+                addConsoleMessage(`Energia: ${gameState.energy}% - ${gameState.energy > 50 ? 'Suficiente' : 'Baixa'}`, 
+                                gameState.energy > 50 ? 'system' : 'warning');
+            });
+            
+            // Logo (efeito especial)
+            document.getElementById('mainLogo').addEventListener('click', () => {
+                addConsoleMessage("Sistema NEON DASH v2.4.7 - Todos os sistemas operacionais", 'system');
+                document.querySelector('.logo').classList.add('glitch');
+                setTimeout(() => {
+                    document.querySelector('.logo').classList.remove('glitch');
+                }, 1000);
+            });
+        }
+
+        // Configurar modal
+        function setupModal() {
+            let currentCallback = null;
+            
+            elements.modalCancel.addEventListener('click', () => {
+                elements.modal.classList.remove('active');
+                currentCallback = null;
+            });
+            
+            elements.modalConfirm.addEventListener('click', () => {
+                if (currentCallback) {
+                    currentCallback();
+                }
+                elements.modal.classList.remove('active');
+                currentCallback = null;
+            });
+            
+            // Fechar modal ao clicar fora
+            elements.modal.addEventListener('click', (e) => {
+                if (e.target === elements.modal) {
+                    elements.modal.classList.remove('active');
+                    currentCallback = null;
+                }
+            });
+        }
+
+        // Mostrar modal
+        function showModal(title, message, callback, showCancel = true) {
+            elements.modalTitle.textContent = title;
+            elements.modalMessage.textContent = message;
+            elements.modalConfirm.style.display = 'block';
+            elements.modalCancel.style.display = showCancel ? 'block' : 'none';
+            
+            // Armazenar callback
+            window.currentModalCallback = callback;
+            
+            // Mostrar modal
+            elements.modal.classList.add('active');
+            
+            // Configurar callback
+            elements.modalConfirm.onclick = () => {
+                if (callback) callback();
+                elements.modal.classList.remove('active');
+            };
+        }
+
+        // Melhorar atributo
+        function upgradeStat(stat, cost) {
+            if (gameState[stat].value < 100) {
+                gameState.credits -= cost;
+                gameState[stat].value = Math.min(100, gameState[stat].value + 5);
+                gameState[stat].level += 1;
+                
+                updateGameUI();
+                updateStatusBars();
+                
+                addConsoleMessage(`${stat.toUpperCase()} melhorado para ${gameState[stat].value}% (Nível ${gameState[stat].level})`, 'system');
+                addConsoleMessage(`${cost}cr deduzidos. Créditos restantes: ${gameState.credits}cr`, 'system');
+            } else {
+                addConsoleMessage(`${stat.toUpperCase()} já está no máximo!`, 'warning');
+            }
+        }
+
+        // Comprar item
+        function buyItem() {
+            const items = [
+                { name: "Nanites", type: "upgrade", icon: "fas fa-atom" },
+                { name: "Visão Noturna", type: "vision", icon: "fas fa-eye" },
+                { name: "Implante", type: "implant", icon: "fas fa-user-md" },
+                { name: "Drone", type: "drone", icon: "fas fa-robot" },
+                { name: "Ciberarma", type: "weapon", icon: "fas fa-hand-fist" }
+            ];
+            
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            randomItem.id = gameState.inventory.length + 1;
+            
+            gameState.inventory.push(randomItem);
+            gameState.credits -= 1000;
+            
+            updateGameUI();
+            setupInventory();
+            
+            addConsoleMessage(`Item comprado: ${randomItem.name} (${randomItem.type})`, 'system');
+            addConsoleMessage(`1000cr deduzidos. Créditos restantes: ${gameState.credits}cr`, 'system');
+        }
+
+        // Vender item
+        function sellItem() {
+            if (gameState.inventory.length > 0) {
+                const randomIndex = Math.floor(Math.random() * gameState.inventory.length);
+                const soldItem = gameState.inventory.splice(randomIndex, 1)[0];
+                
+                gameState.credits += 500;
+                
+                updateGameUI();
+                setupInventory();
+                
+                addConsoleMessage(`Item vendido: ${soldItem.name} (${soldItem.type})`, 'system');
+                addConsoleMessage(`500cr adicionados. Créditos totais: ${gameState.credits}cr`, 'system');
+            }
+        }
+
+        // Viajar para localização
+        function travelTo(location, cost) {
+            gameState.credits -= cost;
+            gameState.currentLocation = location;
+            
+            updateGameUI();
+            
+            addConsoleMessage(`Viajando para ${location}...`, 'system');
+            addConsoleMessage(`${cost}cr deduzidos. Créditos restantes: ${gameState.credits}cr`, 'system');
+            
+            // Simular eventos durante a viagem
+            setTimeout(() => {
+                const events = [
+                    "Viagem tranquila. Nenhum incidente.",
+                    "Encontro com comerciantes durante o trajeto.",
+                    "Pequeno desvio para evitar patrulha corporativa.",
+                    "Sistema de navegação otimizado para rota mais rápida."
+                ];
+                const randomEvent = events[Math.floor(Math.random() * events.length)];
+                addConsoleMessage(randomEvent, 'system');
+                addConsoleMessage(`Chegou em ${location}.`, 'system');
+            }, 1500);
+        }
+
+        // Salvar jogo
+        function saveGame() {
+            localStorage.setItem('neonDashSave', JSON.stringify(gameState));
+            addConsoleMessage("Jogo salvo com sucesso!", 'system');
+            
+            // Adicionar alerta
+            gameState.alerts.push({
+                id: gameState.alerts.length + 1,
+                text: "Progresso do jogo salvo",
+                type: "success",
+                active: true
+            });
+            setupAlerts();
+        }
+
+        // Carregar jogo
+        function loadGame() {
+            const saved = localStorage.getItem('neonDashSave');
+            if (saved) {
+                try {
+                    const loadedState = JSON.parse(saved);
+                    Object.assign(gameState, loadedState);
+                    
+                    updateGameUI();
+                    updateStatusBars();
+                    setupMissionList();
+                    setupMissionsGrid();
+                    setupInventory();
+                    setupAlerts();
+                    
+                    addConsoleMessage("Jogo carregado com sucesso!", 'system');
+                    
+                    // Adicionar alerta
+                    gameState.alerts.push({
+                        id: gameState.alerts.length + 1,
+                        text: "Progresso do jogo carregado",
+                        type: "success",
+                        active: true
+                    });
+                    setupAlerts();
+                } catch (e) {
+                    addConsoleMessage("Erro ao carregar jogo salvo.", 'error');
+                }
+            } else {
+                addConsoleMessage("Nenhum jogo salvo encontrado.", 'warning');
+            }
+        }
+
+        // Efeito de glitch aleatório no título
+        setInterval(() => {
+            const glitchElement = document.querySelector('.glitch');
+            if (Math.random() > 0.7) {
+                glitchElement.style.animation = 'none';
+                setTimeout(() => {
+                    glitchElement.style.animation = '';
+                }, 100);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
