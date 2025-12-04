@@ -1,533 +1,590 @@
-// ===== CONFIGURAÇÕES DO JOGO =====
+// ===== CONFIGURAÇÃO DO JOGO =====
 const CONFIG = {
-    VERSION: '2.4.7',
-    BUILD: '7842',
-    SAVE_KEY: 'cyberpunk_game_save',
-    AUTO_SAVE_INTERVAL: 30000 // 30 segundos
+    VERSION: '1.0',
+    SAVE_KEY: 'neon_dash_save'
 };
 
 // ===== ESTADO DO JOGO =====
 const gameState = {
-    // Informações básicas
-    playerName: 'NEXUS_ONE',
     credits: 12450,
     level: 24,
-    experience: 18500,
-    nextLevelExp: 24000,
-    
-    // Atributos vitais
     health: 85,
-    maxHealth: 100,
-    energy: 72,
-    maxEnergy: 100,
-    
-    // Atributos do personagem
     attributes: {
-        strength: { value: 68, level: 7 },
-        hacking: { value: 94, level: 9 },
-        agility: { value: 76, level: 6 },
-        intelligence: { value: 88, level: 8 }
+        str: { value: 68, level: 7 },
+        hack: { value: 94, level: 9 },
+        agi: { value: 76, level: 6 }
     },
-    
-    // Inventário
     inventory: [
-        { id: 1, name: "Pistola Laser", type: "weapon", icon: "fas fa-gun", value: 1200 },
-        { id: 2, name: "Armadura Tática", type: "armor", icon: "fas fa-shield-alt", value: 800 },
-        { id: 3, name: "Kit Médico Avançado", type: "health", icon: "fas fa-first-aid", value: 500 },
-        { id: 4, name: "Hack Tool Mk.III", type: "tool", icon: "fas fa-screwdriver-wrench", value: 1500 },
-        { id: 5, name: "Bateria de Energia", type: "energy", icon: "fas fa-battery-full", value: 300 },
-        { id: 6, name: "Dados Confidenciais", type: "data", icon: "fas fa-database", value: 2000 },
-        { id: 7, name: "Chave de Acesso", type: "key", icon: "fas fa-key", value: 400 },
-        { id: 8, name: "Chip Neural", type: "chip", icon: "fas fa-microchip", value: 1800 },
-        { id: 9, name: "Óculos de Visão Noturna", type: "vision", icon: "fas fa-glasses", value: 900 },
-        { id: 10, name: "Comms Encrypted", type: "comms", icon: "fas fa-walkie-talkie", value: 600 },
-        { id: 11, name: "Munição Laser", type: "ammo", icon: "fas fa-bullseye", value: 100 },
-        { id: 12, name: "Criptomoedas", type: "money", icon: "fas fa-money-bill-wave", value: 2500 }
+        { id: 1, name: "Pistola", icon: "fas fa-gun" },
+        { id: 2, name: "Armadura", icon: "fas fa-shield-alt" },
+        { id: 3, name: "Kit Médico", icon: "fas fa-first-aid" },
+        { id: 4, name: "Hack Tool", icon: "fas fa-screwdriver" },
+        { id: 5, name: "Chave", icon: "fas fa-key" },
+        { id: 6, name: "Chip", icon: "fas fa-microchip" }
     ],
-    
-    // Sistema de missões
     missions: [
-        { 
-            id: 1, 
-            name: "Infiltrar a Corporação", 
-            description: "Entre na Megacorp sem ser detectado pelos sistemas de segurança",
-            reward: 1500, 
-            xpReward: 500,
-            completed: true, 
-            active: false,
-            difficulty: "Média",
-            location: "downtown"
-        },
-        { 
-            id: 2, 
-            name: "Roubar Dados Confidenciais", 
-            description: "Acesse o servidor principal e copie os dados da nova tecnologia",
-            reward: 2500, 
-            xpReward: 800,
-            completed: false, 
-            active: true,
-            difficulty: "Alta",
-            location: "cybercore"
-        },
-        { 
-            id: 3, 
-            name: "Desativar Sistema de Segurança", 
-            description: "Encontre e desative o sistema de segurança do prédio principal",
-            reward: 1800, 
-            xpReward: 600,
-            completed: false, 
-            active: false,
-            difficulty: "Média",
-            location: "downtown"
-        },
-        { 
-            id: 4, 
-            name: "Encontrar o Informante", 
-            description: "Encontre o informante no setor 7 para obter informações cruciais",
-            reward: 1200, 
-            xpReward: 400,
-            completed: false, 
-            active: false,
-            difficulty: "Baixa",
-            location: "residential"
-        },
-        { 
-            id: 5, 
-            name: "Hackear Terminal Principal", 
-            description: "Use suas habilidades de hacking para acessar o terminal central",
-            reward: 3000, 
-            xpReward: 1000,
-            completed: false, 
-            active: false,
-            difficulty: "Muito Alta",
-            location: "cybercore"
-        },
-        { 
-            id: 6, 
-            name: "Eliminar Guardas da Área", 
-            description: "Neutralize os guardas da área sem alertar reforços",
-            reward: 2000, 
-            xpReward: 700,
-            completed: false, 
-            active: false,
-            difficulty: "Alta",
-            location: "docks"
-        }
+        { id: 1, name: "Infiltrar Base", desc: "Entre na base inimiga", reward: 1500, completed: false },
+        { id: 2, name: "Roubar Dados", desc: "Obtenha dados confidenciais", reward: 2500, completed: false },
+        { id: 3, name: "Desativar Sistema", desc: "Desative o sistema de segurança", reward: 1800, completed: true }
     ],
-    
-    // Progresso do jogo
-    currentLocation: "downtown",
-    gameTime: 0, // Em segundos
-    alerts: [
-        { id: 1, text: "Novo update disponível para sistema", type: "warning", timestamp: Date.now() },
-        { id: 2, text: "Conexão segura estabelecida com servidor", type: "success", timestamp: Date.now() },
-        { id: 3, text: "Alerta: Servidor 03 sob ataque", type: "error", timestamp: Date.now() }
-    ],
-    
-    // Configurações
-    settings: {
-        volume: 80,
-        sfxEnabled: true,
-        theme: "neon",
-        effectsEnabled: true,
-        difficulty: "normal",
-        autosave: true
-    }
+    location: "downtown"
 };
 
-// ===== ELEMENTOS DO DOM =====
+// ===== ELEMENTOS DOM =====
 const DOM = {
-    // Header
-    creditsValue: document.getElementById('creditsValue'),
-    levelValue: document.getElementById('levelValue'),
-    healthValue: document.getElementById('healthValue'),
-    energyValue: document.getElementById('energyValue'),
+    credits: document.getElementById('credits'),
+    level: document.getElementById('level'),
+    health: document.getElementById('health'),
     
-    // Side panel stats
-    strengthValue: document.getElementById('strengthValue'),
-    hackingValue: document.getElementById('hackingValue'),
-    agilityValue: document.getElementById('agilityValue'),
-    intelligenceValue: document.getElementById('intelligenceValue'),
-    strengthBar: document.getElementById('strengthBar'),
-    hackingBar: document.getElementById('hackingBar'),
-    agilityBar: document.getElementById('agilityBar'),
-    intelligenceBar: document.getElementById('intelligenceBar'),
+    // Status bars
+    strValue: document.getElementById('strValue'),
+    strBar: document.getElementById('strBar'),
+    hackValue: document.getElementById('hackValue'),
+    hackBar: document.getElementById('hackBar'),
+    agiValue: document.getElementById('agiValue'),
+    agiBar: document.getElementById('agiBar'),
     
-    // Lists and grids
+    // Level displays
+    strLvl: document.getElementById('strLvl'),
+    hackLvl: document.getElementById('hackLvl'),
+    agiLvl: document.getElementById('agiLvl'),
+    
+    // Lists
     missionsList: document.getElementById('missionsList'),
-    missionsGrid: document.getElementById('missionsGrid'),
     inventoryGrid: document.getElementById('inventoryGrid'),
-    alertsContainer: document.getElementById('alertsContainer'),
-    
-    // Content areas
-    contentAreas: document.querySelectorAll('.content-area'),
     
     // Modal
-    modal: document.getElementById('confirmationModal'),
+    modal: document.getElementById('modal'),
     modalTitle: document.getElementById('modalTitle'),
-    modalMessage: document.getElementById('modalMessage'),
-    modalConfirm: document.getElementById('modalConfirm'),
+    modalText: document.getElementById('modalText'),
     modalCancel: document.getElementById('modalCancel'),
+    modalConfirm: document.getElementById('modalConfirm'),
     
     // Console
-    consoleOutput: document.getElementById('consoleOutput'),
-    consoleInput: document.getElementById('consoleInput'),
-    
-    // Buttons
-    menuButtons: document.querySelectorAll('.menu-btn'),
-    upgradeButtons: document.querySelectorAll('.upgrade-btn'),
-    buyItemBtn: document.getElementById('buyItemBtn'),
-    sellItemBtn: document.getElementById('sellItemBtn'),
-    travelBtn: document.getElementById('travelBtn'),
-    clearConsoleBtn: document.getElementById('clearConsoleBtn'),
-    
-    // Footer buttons
-    saveGameBtn: document.getElementById('saveGameBtn'),
-    loadGameBtn: document.getElementById('loadGameBtn'),
-    helpBtn: document.getElementById('helpBtn'),
-    aboutBtn: document.getElementById('aboutBtn')
+    console: document.getElementById('console'),
+    commandInput: document.getElementById('commandInput'),
+    clearConsole: document.getElementById('clearConsole')
 };
 
-// ===== SISTEMA DE INICIALIZAÇÃO =====
-class GameSystem {
+// ===== INICIALIZAÇÃO =====
+class Game {
     constructor() {
-        this.particlesCreated = false;
-        this.gameTimer = null;
-        this.autoSaveTimer = null;
-        this.currentModalCallback = null;
+        this.init();
     }
     
     init() {
-        console.log(`🚀 Inicializando NEON DASH v${CONFIG.VERSION}`);
-        
         this.createParticles();
         this.setupEventListeners();
-        this.loadGame(); // Tenta carregar jogo salvo
-        this.updateAllUI();
-        this.setupConsole();
+        this.updateUI();
         this.setupModal();
-        this.startGameTimer();
-        this.startAutoSave();
+        this.setupConsole();
         
-        this.addConsoleMessage("Sistema inicializado com sucesso", "system");
-        this.addConsoleMessage(`Bem-vindo, ${gameState.playerName}`, "user");
-        this.addConsoleMessage("Digite 'help' para ver comandos disponíveis", "system");
-        
-        // Mostrar área inicial
-        this.showContentArea('missions');
+        this.log('Sistema inicializado', 'system');
+        this.log('Bem-vindo ao NEON DASH', 'success');
     }
     
-    // ===== SISTEMA DE PARTÍCULAS =====
+    // ===== PARTÍCULAS =====
     createParticles() {
-        if (this.particlesCreated) return;
-        
         const container = document.getElementById('particles');
-        const count = 30;
-        
-        for (let i = 0; i < count; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            // Tamanho aleatório
-            const size = Math.random() * 4 + 1;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            
-            // Posição aleatória
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
-            
-            // Cor aleatória
-            const colors = ['#0ff0fc', '#ff00ff', '#9d00ff', '#00ff9d'];
-            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            // Animação
-            const duration = Math.random() * 30 + 20;
-            particle.style.animationDuration = `${duration}s`;
-            particle.style.animationDelay = `${Math.random() * 5}s`;
-            
-            container.appendChild(particle);
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.style.cssText = `
+                position: absolute;
+                width: ${Math.random() * 3 + 1}px;
+                height: ${Math.random() * 3 + 1}px;
+                background: #0ff0fc;
+                border-radius: 50%;
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                opacity: 0.5;
+                animation: float ${Math.random() * 20 + 10}s infinite linear;
+            `;
+            container.appendChild(p);
         }
         
-        this.particlesCreated = true;
+        // Adicionar animação CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0% { transform: translateY(0) translateX(0); }
+                100% { transform: translateY(-100vh) translateX(100px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // ===== EVENT LISTENERS =====
+    setupEventListeners() {
+        // Menu buttons
+        document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Remove active from all
+                document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+                // Add active to clicked
+                e.target.classList.add('active');
+                
+                // Show corresponding tab
+                const tab = e.target.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tab}Tab`).classList.add('active');
+            });
+        });
+        
+        // Upgrade buttons
+        document.querySelectorAll('.btn-upgrade').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const stat = e.target.dataset.stat;
+                this.upgradeAttribute(stat);
+            });
+        });
+        
+        // Mission button
+        document.getElementById('newMissionBtn')?.addEventListener('click', () => {
+            this.generateMission();
+        });
+        
+        // Inventory buttons
+        document.getElementById('buyBtn')?.addEventListener('click', () => {
+            this.buyItem();
+        });
+        
+        document.getElementById('sellBtn')?.addEventListener('click', () => {
+            this.sellItem();
+        });
+        
+        // Travel button
+        document.getElementById('travelBtn')?.addEventListener('click', () => {
+            this.travel();
+        });
+        
+        // Settings buttons
+        document.getElementById('saveBtn')?.addEventListener('click', () => {
+            this.saveGame();
+        });
+        
+        document.getElementById('loadBtn')?.addEventListener('click', () => {
+            this.loadGame();
+        });
+        
+        // Volume slider
+        document.getElementById('volume')?.addEventListener('input', (e) => {
+            document.getElementById('volumeValue').textContent = `${e.target.value}%`;
+        });
+        
+        // Effects toggle
+        document.getElementById('effects')?.addEventListener('change', (e) => {
+            const particles = document.getElementById('particles');
+            particles.style.display = e.target.checked ? 'block' : 'none';
+        });
+        
+        // Click missions
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.mission')) {
+                const mission = e.target.closest('.mission');
+                const missionId = parseInt(mission.dataset.id);
+                this.startMission(missionId);
+            }
+            
+            if (e.target.closest('.location')) {
+                document.querySelectorAll('.location').forEach(loc => {
+                    loc.classList.remove('active');
+                });
+                e.target.closest('.location').classList.add('active');
+            }
+        });
+        
+        // Logo click effect
+        document.getElementById('logo').addEventListener('click', () => {
+            this.log('Sistema NEON DASH v1.0', 'system');
+            const logo = document.getElementById('logo');
+            logo.style.animation = 'none';
+            setTimeout(() => logo.style.animation = '', 100);
+        });
     }
     
     // ===== ATUALIZAÇÃO DA UI =====
-    updateAllUI() {
-        this.updateHeader();
-        this.updateAttributes();
-        this.updateMissionList();
-        this.updateMissionsGrid();
+    updateUI() {
+        // Credits, level, health
+        DOM.credits.textContent = gameState.credits.toLocaleString();
+        DOM.level.textContent = gameState.level;
+        DOM.health.textContent = gameState.health;
+        
+        // Attribute values
+        DOM.strValue.textContent = `${gameState.attributes.str.value}%`;
+        DOM.hackValue.textContent = `${gameState.attributes.hack.value}%`;
+        DOM.agiValue.textContent = `${gameState.attributes.agi.value}%`;
+        
+        // Attribute bars
+        DOM.strBar.style.width = `${gameState.attributes.str.value}%`;
+        DOM.hackBar.style.width = `${gameState.attributes.hack.value}%`;
+        DOM.agiBar.style.width = `${gameState.attributes.agi.value}%`;
+        
+        // Levels
+        DOM.strLvl.textContent = gameState.attributes.str.level;
+        DOM.hackLvl.textContent = gameState.attributes.hack.level;
+        DOM.agiLvl.textContent = gameState.attributes.agi.level;
+        
+        // Update missions list
+        this.updateMissionsList();
+        
+        // Update inventory
         this.updateInventory();
-        this.updateAlerts();
-        this.updateSettingsUI();
     }
     
-    updateHeader() {
-        DOM.creditsValue.textContent = gameState.credits.toLocaleString();
-        DOM.levelValue.textContent = gameState.level;
-        DOM.healthValue.textContent = `${gameState.health}%`;
-        DOM.energyValue.textContent = `${gameState.energy}%`;
+    updateMissionsList() {
+        if (!DOM.missionsList) return;
         
-        // Atualizar tempo de jogo
-        const hours = Math.floor(gameState.gameTime / 3600);
-        const minutes = Math.floor((gameState.gameTime % 3600) / 60);
-        const seconds = gameState.gameTime % 60;
-        document.getElementById('gameTime').textContent = 
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-    
-    updateAttributes() {
-        const attrs = gameState.attributes;
-        
-        DOM.strengthValue.textContent = `${attrs.strength.value}%`;
-        DOM.hackingValue.textContent = `${attrs.hacking.value}%`;
-        DOM.agilityValue.textContent = `${attrs.agility.value}%`;
-        DOM.intelligenceValue.textContent = `${attrs.intelligence.value}%`;
-        
-        DOM.strengthBar.style.width = `${attrs.strength.value}%`;
-        DOM.hackingBar.style.width = `${attrs.hacking.value}%`;
-        DOM.agilityBar.style.width = `${attrs.agility.value}%`;
-        DOM.intelligenceBar.style.width = `${attrs.intelligence.value}%`;
-        
-        // Atualizar níveis nas cartas
-        document.getElementById('strengthLevel').textContent = attrs.strength.level;
-        document.getElementById('hackingLevel').textContent = attrs.hacking.level;
-        document.getElementById('agilityLevel').textContent = attrs.agility.level;
-        document.getElementById('intelligenceLevel').textContent = attrs.intelligence.level;
-        
-        // Atualizar barras de progresso
-        document.querySelectorAll('.progress-fill').forEach((bar, i) => {
-            const values = Object.values(attrs);
-            if (values[i]) {
-                bar.style.width = `${values[i].value}%`;
-            }
-        });
-    }
-    
-    updateMissionList() {
         DOM.missionsList.innerHTML = '';
-        
         gameState.missions.forEach(mission => {
-            if (mission.completed || mission.active) {
-                const li = document.createElement('li');
-                li.className = `mission-item ${mission.completed ? 'completed' : ''} ${mission.active ? 'active' : ''}`;
-                li.innerHTML = `
-                    <strong>MISSÃO ${mission.id}:</strong> ${mission.name}
-                    ${mission.completed ? ' ✓' : ''}
-                `;
-                li.addEventListener('click', () => this.selectMission(mission.id));
-                DOM.missionsList.appendChild(li);
-            }
-        });
-    }
-    
-    updateMissionsGrid() {
-        DOM.missionsGrid.innerHTML = '';
-        
-        const availableMissions = gameState.missions.filter(m => !m.completed);
-        
-        if (availableMissions.length === 0) {
-            DOM.missionsGrid.innerHTML = `
-                <div class="content-card" style="grid-column: 1/-1; text-align: center;">
-                    <h3 class="card-title">TODAS AS MISSÕES CONCLUÍDAS</h3>
-                    <p class="card-desc">Novas missões serão disponibilizadas em breve...</p>
-                </div>
+            const div = document.createElement('div');
+            div.className = `mission ${mission.completed ? 'completed' : ''}`;
+            div.dataset.id = mission.id;
+            div.innerHTML = `
+                <h4>${mission.name}</h4>
+                <p>${mission.desc}</p>
+                <div class="reward">${mission.reward}cr</div>
             `;
-            return;
-        }
-        
-        availableMissions.forEach(mission => {
-            const card = document.createElement('div');
-            card.className = 'content-card';
-            card.innerHTML = `
-                <div class="mission-header">
-                    <span class="mission-difficulty ${mission.difficulty.toLowerCase()}">${mission.difficulty}</span>
-                    <span class="mission-location">${mission.location.toUpperCase()}</span>
-                </div>
-                <h3 class="card-title">${mission.name}</h3>
-                <p class="card-desc">${mission.description}</p>
-                <div class="mission-rewards">
-                    <span class="reward-credits"><i class="fas fa-coins"></i> ${mission.reward}cr</span>
-                    <span class="reward-xp"><i class="fas fa-star"></i> ${mission.xpReward}XP</span>
-                </div>
-                <button class="card-button mission-start-btn" data-mission-id="${mission.id}">
-                    ${mission.active ? 'CONTINUAR MISSÃO' : 'INICIAR MISSÃO'}
-                </button>
-            `;
-            DOM.missionsGrid.appendChild(card);
-        });
-        
-        // Adicionar eventos aos botões de missão
-        document.querySelectorAll('.mission-start-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const missionId = parseInt(e.target.dataset.missionId);
-                this.startMission(missionId);
-            });
+            DOM.missionsList.appendChild(div);
         });
     }
     
     updateInventory() {
+        if (!DOM.inventoryGrid) return;
+        
         DOM.inventoryGrid.innerHTML = '';
-        const capacity = gameState.inventory.length;
-        
-        // Atualizar capacidade
-        document.getElementById('inventoryCapacity').textContent = `${capacity}/24`;
-        
-        // Slots ocupados
         gameState.inventory.forEach(item => {
-            const slot = this.createInventorySlot(item, false);
-            DOM.inventoryGrid.appendChild(slot);
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `
+                <i class="${item.icon}"></i>
+                <span>${item.name}</span>
+            `;
+            DOM.inventoryGrid.appendChild(div);
         });
         
-        // Slots vazios
-        for (let i = capacity; i < 24; i++) {
-            const slot = this.createInventorySlot(null, true);
-            DOM.inventoryGrid.appendChild(slot);
-        }
-    }
-    
-    createInventorySlot(item, isEmpty) {
-        const slot = document.createElement('div');
-        slot.className = `inventory-slot ${isEmpty ? 'empty' : ''}`;
-        
-        if (isEmpty) {
-            slot.innerHTML = `
-                <div class="slot-icon"><i class="fas fa-plus"></i></div>
-                <div class="slot-name">VAZIO</div>
+        // Add empty slots
+        const emptySlots = 12 - gameState.inventory.length;
+        for (let i = 0; i < emptySlots; i++) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `
+                <i class="fas fa-plus"></i>
+                <span>Vazio</span>
             `;
-            slot.addEventListener('click', () => {
-                this.addConsoleMessage("Slot vazio. Compre itens para preencher.", "info");
-            });
-        } else {
-            slot.innerHTML = `
-                <div class="slot-icon"><i class="${item.icon}"></i></div>
-                <div class="slot-name">${item.name}</div>
-            `;
-            slot.addEventListener('click', () => {
-                this.showItemDetails(item);
-            });
-        }
-        
-        return slot;
-    }
-    
-    showItemDetails(item) {
-        this.showModal(
-            "DETALHES DO ITEM",
-            `<strong>${item.name}</strong><br>
-            Tipo: ${item.type.toUpperCase()}<br>
-            Valor: ${item.value}cr<br><br>
-            <small>ID: ${item.id}</small>`,
-            null,
-            false
-        );
-    }
-    
-    updateAlerts() {
-        DOM.alertsContainer.innerHTML = '';
-        
-        gameState.alerts.forEach(alert => {
-            const p = document.createElement('p');
-            let icon = 'fas fa-info-circle';
-            let color = '#0ff0fc';
-            
-            switch(alert.type) {
-                case 'warning': icon = 'fas fa-exclamation-triangle'; color = '#ffff00'; break;
-                case 'error': icon = 'fas fa-times-circle'; color = '#ff0033'; break;
-                case 'success': icon = 'fas fa-check-circle'; color = '#00ff00'; break;
-            }
-            
-            p.innerHTML = `<i class="${icon}" style="color: ${color};"></i> <span>${alert.text}</span>`;
-            p.style.cursor = 'pointer';
-            p.addEventListener('click', () => {
-                this.removeAlert(alert.id);
-            });
-            DOM.alertsContainer.appendChild(p);
-        });
-    }
-    
-    removeAlert(alertId) {
-        const index = gameState.alerts.findIndex(a => a.id === alertId);
-        if (index > -1) {
-            gameState.alerts.splice(index, 1);
-            this.updateAlerts();
-        }
-    }
-    
-    updateSettingsUI() {
-        // Atualizar sliders e toggles baseados no gameState.settings
-        const settings = gameState.settings;
-        
-        if (document.getElementById('volumeSlider')) {
-            document.getElementById('volumeSlider').value = settings.volume;
-            document.getElementById('volumeValue').textContent = `${settings.volume}%`;
-        }
-        
-        if (document.getElementById('sfxToggle')) {
-            document.getElementById('sfxToggle').checked = settings.sfxEnabled;
-        }
-        
-        if (document.getElementById('effectsToggle')) {
-            document.getElementById('effectsToggle').checked = settings.effectsEnabled;
-        }
-        
-        if (document.getElementById('autosaveToggle')) {
-            document.getElementById('autosaveToggle').checked = settings.autosave;
-        }
-        
-        if (document.getElementById('themeSelect')) {
-            document.getElementById('themeSelect').value = settings.theme;
-        }
-        
-        if (document.getElementById('difficultySelect')) {
-            document.getElementById('difficultySelect').value = settings.difficulty;
+            DOM.inventoryGrid.appendChild(div);
         }
     }
     
     // ===== SISTEMA DE MISSÕES =====
-    selectMission(missionId) {
-        const mission = gameState.missions.find(m => m.id === missionId);
-        if (!mission) return;
+    generateMission() {
+        const missions = [
+            { name: "Proteger VIP", desc: "Escolte o VIP até o local seguro", reward: 1200 },
+            { name: "Hackear Sistema", desc: "Invada o sistema de segurança", reward: 2000 },
+            { name: "Coletar Amostra", desc: "Obtenha a amostra biológica", reward: 800 },
+            { name: "Eliminar Alvo", desc: "Neutralize o alvo especificado", reward: 3000 }
+        ];
         
-        // Desselecionar todas as missões
-        gameState.missions.forEach(m => m.active = false);
+        const mission = missions[Math.floor(Math.random() * missions.length)];
+        mission.id = Date.now();
+        mission.completed = false;
         
-        // Selecionar esta missão
-        mission.active = true;
+        gameState.missions.push(mission);
+        this.updateMissionsList();
         
-        this.updateMissionList();
-        this.updateMissionsGrid();
-        
-        this.addConsoleMessage(`Missão "${mission.name}" selecionada`, "system");
+        this.log(`Nova missão disponível: ${mission.name}`, 'success');
     }
     
     startMission(missionId) {
         const mission = gameState.missions.find(m => m.id === missionId);
-        if (!mission) {
-            this.addConsoleMessage("Missão não encontrada", "error");
-            return;
-        }
+        if (!mission || mission.completed) return;
         
         this.showModal(
-            "INICIAR MISSÃO",
-            `<strong>${mission.name}</strong><br>
-            Local: ${mission.location.toUpperCase()}<br>
-            Dificuldade: ${mission.difficulty}<br><br>
-            Recompensa: ${mission.reward}cr + ${mission.xpReward}XP<br><br>
-            <em>${mission.description}</em>`,
+            'INICIAR MISSÃO',
+            `Iniciar missão "${mission.name}"?<br>Recompensa: ${mission.reward}cr`,
             () => {
-                this.executeMission(mission);
+                this.log(`Iniciando missão: ${mission.name}`, 'system');
+                
+                // Simulate mission completion after delay
+                setTimeout(() => {
+                    mission.completed = true;
+                    gameState.credits += mission.reward;
+                    
+                    this.updateUI();
+                    this.log(`Missão concluída! +${mission.reward}cr`, 'success');
+                }, 2000);
             }
         );
     }
     
-    executeMission(mission) {
-        this.addConsoleMessage(`Iniciando missão: ${mission.name}`, "system");
-        this.addConsoleMessage("Infiltração em andamento...", "info");
+    // ===== SISTEMA DE ATRIBUTOS =====
+    upgradeAttribute(stat) {
+        const attr = gameState.attributes[stat];
+        if (!attr) return;
         
-        // Simular progresso
-        mission.active = true;
-        this.updateMissionList();
+        if (attr.value >= 100) {
+            this.log('Este atributo já está no máximo!', 'error');
+            return;
+        }
         
-        // Timer p
+        const cost = this.getUpgradeCost(stat);
+        
+        if (gameState.credits < cost) {
+            this.log(`Créditos insuficientes. Necessário: ${cost}cr`, 'error');
+            return;
+        }
+        
+        this.showModal(
+            'MELHORAR ATRIBUTO',
+            `Melhorar ${stat.toUpperCase()}?<br>Custo: ${cost}cr`,
+            () => {
+                gameState.credits -= cost;
+                attr.value = Math.min(100, attr.value + 5);
+                attr.level++;
+                
+                this.updateUI();
+                this.log(`${stat.toUpperCase()} melhorado para ${attr.value}%`, 'success');
+            }
+        );
+    }
+    
+    getUpgradeCost(stat) {
+        const base = {
+            str: 500,
+            hack: 750,
+            agi: 450
+        };
+        return Math.floor(base[stat] * (1 + gameState.attributes[stat].level * 0.1));
+    }
+    
+    // ===== INVENTÁRIO =====
+    buyItem() {
+        if (gameState.credits < 1000) {
+            this.log('Créditos insuficientes para comprar item', 'error');
+            return;
+        }
+        
+        if (gameState.inventory.length >= 12) {
+            this.log('Inventário cheio!', 'error');
+            return;
+        }
+        
+        this.showModal(
+            'COMPRAR ITEM',
+            'Comprar item aleatório por 1000cr?',
+            () => {
+                const items = [
+                    { name: "Visão Noturna", icon: "fas fa-eye" },
+                    { name: "Drone", icon: "fas fa-robot" },
+                    { name: "Implante", icon: "fas fa-microchip" },
+                    { name: "Nanites", icon: "fas fa-atom" }
+                ];
+                
+                const item = items[Math.floor(Math.random() * items.length)];
+                item.id = Date.now();
+                
+                gameState.inventory.push(item);
+                gameState.credits -= 1000;
+                
+                this.updateUI();
+                this.log(`Item comprado: ${item.name}`, 'success');
+            }
+        );
+    }
+    
+    sellItem() {
+        if (gameState.inventory.length === 0) {
+            this.log('Inventário vazio!', 'error');
+            return;
+        }
+        
+        this.showModal(
+            'VENDER ITEM',
+            'Vender item aleatório por 500cr?',
+            () => {
+                const index = Math.floor(Math.random() * gameState.inventory.length);
+                const item = gameState.inventory.splice(index, 1)[0];
+                
+                gameState.credits += 500;
+                
+                this.updateUI();
+                this.log(`Item vendido: ${item.name}`, 'success');
+            }
+        );
+    }
+    
+    // ===== SISTEMA DE VIAGENS =====
+    travel() {
+        const activeLoc = document.querySelector('.location.active');
+        if (!activeLoc) return;
+        
+        const location = activeLoc.dataset.loc;
+        const costText = activeLoc.querySelector('span').textContent;
+        const cost = parseInt(costText.match(/\d+/)[0]);
+        
+        if (gameState.credits < cost) {
+            this.log(`Créditos insuficientes para viajar. Necessário: ${cost}cr`, 'error');
+            return;
+        }
+        
+        this.showModal(
+            'VIAJAR',
+            `Viajar para ${location.toUpperCase()} por ${cost}cr?`,
+            () => {
+                gameState.credits -= cost;
+                gameState.location = location;
+                
+                this.updateUI();
+                this.log(`Viajando para ${location}...`, 'system');
+                
+                setTimeout(() => {
+                    this.log(`Chegou em ${location.toUpperCase()}!`, 'success');
+                }, 1000);
+            }
+        );
+    }
+    
+    // ===== MODAL SYSTEM =====
+    setupModal() {
+        if (!DOM.modal) return;
+        
+        DOM.modalCancel.addEventListener('click', () => this.hideModal());
+        DOM.modalConfirm.addEventListener('click', () => {
+            if (this.modalCallback) {
+                this.modalCallback();
+                this.modalCallback = null;
+            }
+            this.hideModal();
+        });
+        
+        // Close on outside click
+        DOM.modal.addEventListener('click', (e) => {
+            if (e.target === DOM.modal) {
+                this.hideModal();
+            }
+        });
+        
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && DOM.modal.classList.contains('active')) {
+                this.hideModal();
+            }
+        });
+    }
+    
+    showModal(title, text, callback) {
+        if (!DOM.modal) return;
+        
+        DOM.modalTitle.textContent = title;
+        DOM.modalText.innerHTML = text;
+        this.modalCallback = callback;
+        DOM.modal.classList.add('active');
+    }
+    
+    hideModal() {
+        if (!DOM.modal) return;
+        DOM.modal.classList.remove('active');
+        this.modalCallback = null;
+    }
+    
+    // ===== CONSOLE SYSTEM =====
+    setupConsole() {
+        if (!DOM.commandInput) return;
+        
+        // Enter command
+        DOM.commandInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = DOM.commandInput.value.trim().toLowerCase();
+                DOM.commandInput.value = '';
+                
+                if (cmd) {
+                    this.log(`> ${cmd}`, 'user');
+                    this.processCommand(cmd);
+                }
+            }
+        });
+        
+        // Clear console
+        if (DOM.clearConsole) {
+            DOM.clearConsole.addEventListener('click', () => {
+                DOM.console.innerHTML = '';
+                this.log('Console limpo', 'system');
+            });
+        }
+    }
+    
+    log(message, type = 'system') {
+        if (!DOM.console) return;
+        
+        const div = document.createElement('div');
+        div.className = `log ${type}`;
+        div.textContent = message;
+        DOM.console.appendChild(div);
+        
+        // Auto scroll
+        DOM.console.scrollTop = DOM.console.scrollHeight;
+    }
+    
+    processCommand(cmd) {
+        switch(cmd) {
+            case 'help':
+                this.log('Comandos: help, credits, level, missions, inventory, clear, save, load', 'system');
+                break;
+                
+            case 'credits':
+                this.log(`Créditos: ${gameState.credits}cr`, 'system');
+                break;
+                
+            case 'level':
+                this.log(`Nível: ${gameState.level}`, 'system');
+                break;
+                
+            case 'missions':
+                this.log('Missões ativas:', 'system');
+                gameState.missions.forEach(m => {
+                    if (!m.completed) {
+                        this.log(`  ${m.name}: ${m.reward}cr`, 'system');
+                    }
+                });
+                break;
+                
+            case 'inventory':
+                this.log(`Inventário: ${gameState.inventory.length} itens`, 'system');
+                gameState.inventory.forEach(item => {
+                    this.log(`  ${item.name}`, 'system');
+                });
+                break;
+                
+            case 'clear':
+                DOM.console.innerHTML = '';
+                break;
+                
+            case 'save':
+                this.saveGame();
+                break;
+                
+            case 'load':
+                this.loadGame();
+                break;
+                
+            default:
+                this.log(`Comando desconhecido: ${cmd}`, 'error');
+        }
+    }
+    
+    // ===== SAVE/LOAD SYSTEM =====
+    saveGame() {
+        try {
+            const saveData = {
+                ...gameState,
+                saveTime: Date.now(),
+                version: CONFIG.VERSION
+            };
+            
+            localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(saveData));
+            this.log('Jogo salvo com sucesso!', 'success');
+            return true;
+        } catch (e) {
+            this.log(`Erro ao salvar: ${e.message}`, 'error');
+            return
