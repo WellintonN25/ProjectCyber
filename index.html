@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Inventory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --cyber-blue: #00f3ff;
+            --cyber-purple: #bc13fe;
+            --cyber-pink: #ff00ff;
+            --cyber-dark: #0a0a0f;
+            --cyber-gray: #1a1a2e;
+            --cyber-light: #e0e0ff;
+            --cyber-green: #00ff9d;
+            --cyber-yellow: #ffef00;
+            --cyber-red: #ff003c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: var(--cyber-dark);
+            color: var(--cyber-light);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(11, 11, 25, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(188, 19, 254, 0.1) 0%, transparent 20%),
+                linear-gradient(to bottom, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to right, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 2px solid var(--cyber-blue);
+            box-shadow: 0 0 15px var(--cyber-blue);
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--cyber-blue);
+            text-shadow: 0 0 10px var(--cyber-blue);
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        h1::before {
+            content: ">";
+            position: absolute;
+            left: -30px;
+            color: var(--cyber-pink);
+        }
+
+        h1::after {
+            content: "_";
+            animation: blink 1s infinite;
+            color: var(--cyber-blue);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .subtitle {
+            color: var(--cyber-purple);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel de Adicionar Item */
+        .add-panel {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid var(--cyber-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            padding: 25px;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-purple));
+        }
+
+        .panel-title {
+            color: var(--cyber-blue);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--cyber-light);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .cyber-input, .cyber-select {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(10, 10, 15, 0.8);
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-light);
+            font-size: 1rem;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .cyber-input:focus, .cyber-select:focus {
+            outline: none;
+            box-shadow: 0 0 10px var(--cyber-blue);
+        }
+
+        .rarity-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .rarity-option {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .rarity-option:hover {
+            transform: translateY(-3px);
+        }
+
+        .rarity-option.selected {
+            border-color: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .common { color: var(--cyber-light); background: rgba(224, 224, 255, 0.1); }
+        .uncommon { color: var(--cyber-green); background: rgba(0, 255, 157, 0.1); }
+        .rare { color: var(--cyber-blue); background: rgba(0, 243, 255, 0.1); }
+        .epic { color: var(--cyber-purple); background: rgba(188, 19, 254, 0.1); }
+        .legendary { color: var(--cyber-yellow); background: rgba(255, 239, 0, 0.1); }
+        .mythic { color: var(--cyber-red); background: rgba(255, 0, 60, 0.1); }
+
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .file-upload input {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: block;
+            padding: 12px 15px;
+            background-color: rgba(10, 10, 15, 0.8);
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-light);
+            text-align: center;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            background-color: rgba(0, 243, 255, 0.1);
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 150px;
+            border: 1px solid var(--cyber-blue);
+            border-radius: 3px;
+        }
+
+        .cyber-button {
+            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-purple));
+            color: var(--cyber-dark);
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(188, 19, 254, 0.4);
+        }
+
+        .cyber-button:active {
+            transform: translateY(0);
+        }
+
+        /* Inventário */
+        .inventory-panel {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid var(--cyber-purple);
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+            padding: 25px;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inventory-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyber-purple), var(--cyber-pink));
+        }
+
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .item-count {
+            color: var(--cyber-blue);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-light);
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 8px var(--cyber-blue);
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        /* Estilo da barra de rolagem */
+        .inventory-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .inventory-grid::-webkit-scrollbar-track {
+            background: rgba(10, 10, 15, 0.8);
+        }
+
+        .inventory-grid::-webkit-scrollbar-thumb {
+            background: var(--cyber-blue);
+            border-radius: 4px;
+        }
+
+        /* Item Card */
+        .item-card {
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .item-card.common { border-color: var(--cyber-light); }
+        .item-card.uncommon { border-color: var(--cyber-green); }
+        .item-card.rare { border-color: var(--cyber-blue); }
+        .item-card.epic { border-color: var(--cyber-purple); }
+        .item-card.legendary { border-color: var(--cyber-yellow); }
+        .item-card.mythic { border-color: var(--cyber-red); }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--cyber-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .item-rarity {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .item-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .item-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .delete-btn {
+            background: rgba(255, 0, 60, 0.2);
+            border: 1px solid var(--cyber-red);
+            color: var(--cyber-red);
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 0, 60, 0.4);
+            box-shadow: 0 0 8px var(--cyber-red);
+        }
+
+        .empty-inventory {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--cyber-blue);
+            font-size: 1.2rem;
+        }
+
+        .empty-inventory i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--cyber-purple);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid rgba(0, 243, 255, 0.3);
+            color: var(--cyber-light);
+            font-size: 0.9rem;
+            margin-top: 30px;
+        }
+
+        .hologram-effect {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, 50px) rotate(90deg); }
+            50% { transform: translate(50px, 100px) rotate(180deg); }
+            75% { transform: translate(-50px, 50px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .main-grid {
+                gap: 20px;
+            }
+            
+            .add-panel, .inventory-panel {
+                padding: 20px;
+            }
+            
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .rarity-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .inventory-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .filter-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hologram-effect" style="top: 10%; left: 5%;"></div>
+    <div class="hologram-effect" style="top: 60%; right: 10%; animation-delay: -10s;"></div>
+    
+    <div class="container">
+        <header>
+            <h1>CYBERPUNK INVENTORY</h1>
+            <p class="subtitle">GERENCIADOR DE EQUIPAMENTOS NEON</p>
+        </header>
+        
+        <div class="main-grid">
+            <section class="add-panel">
+                <h2 class="panel-title">ADICIONAR ITEM</h2>
+                
+                <div class="form-group">
+                    <label for="itemName">NOME DO ITEM</label>
+                    <input type="text" id="itemName" class="cyber-input" placeholder="Ex: Pistola de Plasma" maxlength="30">
+                </div>
+                
+                <div class="form-group">
+                    <label>GRAU DE RARIDADE</label>
+                    <div class="rarity-options">
+                        <div class="rarity-option common" data-rarity="common">COMUM</div>
+                        <div class="rarity-option uncommon" data-rarity="uncommon">INCOMUM</div>
+                        <div class="rarity-option rare" data-rarity="rare">RARO</div>
+                        <div class="rarity-option epic" data-rarity="epic">ÉPICO</div>
+                        <div class="rarity-option legendary" data-rarity="legendary">LENDÁRIO</div>
+                        <div class="rarity-option mythic" data-rarity="mythic">MÍTICO</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>IMAGEM DO ITEM</label>
+                    <div class="file-upload">
+                        <input type="file" id="itemImage" accept="image/*">
+                        <div class="file-label">
+                            <i class="fas fa-upload"></i> SELECIONAR IMAGEM
+                        </div>
+                    </div>
+                    <div class="image-preview" id="imagePreview">
+                        <p>Nenhuma imagem selecionada</p>
+                    </div>
+                </div>
+                
+                <button class="cyber-button" id="addItemBtn">
+                    <i class="fas fa-plus-circle"></i> ADICIONAR À MOCHILA
+                </button>
+            </section>
+            
+            <section class="inventory-panel">
+                <div class="inventory-header">
+                    <div>
+                        <h2 class="panel-title">MOCHILA</h2>
+                        <div class="item-count">ITENS: <span id="itemCount">0</span></div>
+                    </div>
+                    
+                    <div class="filter-options">
+                        <div class="filter-btn active" data-filter="all">TODOS</div>
+                        <div class="filter-btn" data-filter="common">COMUM</div>
+                        <div class="filter-btn" data-filter="uncommon">INCOMUM</div>
+                        <div class="filter-btn" data-filter="rare">RARO</div>
+                        <div class="filter-btn" data-filter="epic">ÉPICO</div>
+                        <div class="filter-btn" data-filter="legendary">LENDÁRIO</div>
+                        <div class="filter-btn" data-filter="mythic">MÍTICO</div>
+                    </div>
+                </div>
+                
+                <div class="inventory-grid" id="inventoryGrid">
+                    <div class="empty-inventory">
+                        <i class="fas fa-box-open"></i>
+                        <p>SUA MOCHILA ESTÁ VAZIA</p>
+                        <p>Adicione itens para começar sua jornada cyberpunk!</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>CYBERPUNK INVENTORY © 2023 | ARMAZENAMENTO LOCAL | DESENVOLVIDO COM HTML, CSS & JS</p>
+            <p style="margin-top: 5px; color: var(--cyber-blue); font-size: 0.8rem;">Os itens são salvos automaticamente no seu navegador</p>
+        </footer>
+    </div>
+
+    <script>
+        // Elementos do DOM
+        const itemNameInput = document.getElementById('itemName');
+        const rarityOptions = document.querySelectorAll('.rarity-option');
+        const itemImageInput = document.getElementById('itemImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const inventoryGrid = document.getElementById('inventoryGrid');
+        const itemCountElement = document.getElementById('itemCount');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        // Variáveis de estado
+        let selectedRarity = 'common';
+        let currentFilter = 'all';
+        let items = JSON.parse(localStorage.getItem('cyberpunkInventory')) || [];
+        
+        // Inicializar a aplicação
+        document.addEventListener('DOMContentLoaded', () => {
+            // Selecionar raridade padrão
+            document.querySelector('.rarity-option[data-rarity="common"]').classList.add('selected');
+            
+            // Carregar itens do localStorage
+            loadItems();
+            updateItemCount();
+            
+            // Adicionar eventos
+            addEventListeners();
+        });
+        
+        // Adicionar eventos
+        function addEventListeners() {
+            // Selecionar raridade
+            rarityOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remover seleção anterior
+                    rarityOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Selecionar nova opção
+                    option.classList.add('selected');
+                    selectedRarity = option.getAttribute('data-rarity');
+                });
+            });
+            
+            // Preview da imagem
+            itemImageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.addEventListener('load', function() {
+                        imagePreview.innerHTML = `<img src="${this.result}" alt="Preview">`;
+                    });
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.innerHTML = '<p>Nenhuma imagem selecionada</p>';
+                }
+            });
+            
+            // Adicionar item
+            addItemBtn.addEventListener('click', addItem);
+            
+            // Filtrar itens
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remover classe active de todos os botões
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Adicionar classe active ao botão clicado
+                    button.classList.add('active');
+                    
+                    // Aplicar filtro
+                    currentFilter = button.getAttribute('data-filter');
+                    filterItems(currentFilter);
+                });
+            });
+            
+            // Permitir adicionar item com Enter
+            itemNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addItem();
+                }
+            });
+        }
+        
+        // Adicionar novo item
+        function addItem() {
+            const itemName = itemNameInput.value.trim();
+            
+            // Validação
+            if (!itemName) {
+                showNotification('Por favor, insira um nome para o item!', 'error');
+                itemNameInput.focus();
+                return;
+            }
+            
+            // Obter imagem
+            let itemImage = '';
+            const file = itemImageInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    itemImage = e.target.result;
+                    saveItem(itemName, itemImage);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Usar imagem padrão baseada na raridade
+                itemImage = getDefaultImage(selectedRarity);
+                saveItem(itemName, itemImage);
+            }
+        }
+        
+        // Salvar item
+        function saveItem(itemName, itemImage) {
+            // Criar objeto do item
+            const newItem = {
+                id: Date.now(), // ID único baseado no timestamp
+                name: itemName,
+                rarity: selectedRarity,
+                image: itemImage,
+                date: new Date().toLocaleDateString('pt-BR')
+            };
+            
+            // Adicionar à lista
+            items.push(newItem);
+            
+            // Salvar no localStorage
+            localStorage.setItem('cyberpunkInventory', JSON.stringify(items));
+            
+            // Atualizar interface
+            loadItems();
+            updateItemCount();
+            filterItems(currentFilter);
+            
+            // Resetar formulário
+            resetForm();
+            
+            // Mostrar notificação
+            showNotification(`Item "${itemName}" adicionado à mochila!`, 'success');
+        }
+        
+        // Carregar itens
+        function loadItems() {
+            // Se não houver itens, mostrar mensagem de mochila vazia
+            if (items.length === 0) {
+                inventoryGrid.innerHTML = `
+                    <div class="empty-inventory">
+                        <i class="fas fa-box-open"></i>
+                        <p>SUA MOCHILA ESTÁ VAZIA</p>
+                        <p>Adicione itens para começar sua jornada cyberpunk!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Gerar HTML dos itens
+            let itemsHTML = '';
+            
+            items.forEach(item => {
+                const rarityName = getRarityName(item.rarity);
+                const rarityColor = getRarityColor(item.rarity);
+                
+                itemsHTML += `
+                    <div class="item-card ${item.rarity}" data-rarity="${item.rarity}">
+                        <div class="item-header">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-rarity" style="color: ${rarityColor}">${rarityName}</div>
+                        </div>
+                        
+                        <img src="${item.image}" alt="${item.name}" class="item-image">
+                        
+                        <div class="item-actions">
+                            <button class="delete-btn" data-id="${item.id}">
+                                <i class="fas fa-trash"></i> REMOVER
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            inventoryGrid.innerHTML = itemsHTML;
+            
+            // Adicionar eventos aos botões de remover
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    deleteItem(itemId);
+                });
+            });
+        }
+        
+        // Filtrar itens
+        function filterItems(filter) {
+            const allItems = document.querySelectorAll('.item-card');
+            
+            if (filter === 'all') {
+                allItems.forEach(item => {
+                    item.style.display = 'block';
+                });
+            } else {
+                allItems.forEach(item => {
+                    if (item.getAttribute('data-rarity') === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+        }
+        
+        // Excluir item
+        function deleteItem(itemId) {
+            // Encontrar índice do item
+            const itemIndex = items.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                const itemName = items[itemIndex].name;
+                
+                // Remover item do array
+                items.splice(itemIndex, 1);
+                
+                // Atualizar localStorage
+                localStorage.setItem('cyberpunkInventory', JSON.stringify(items));
+                
+                // Atualizar interface
+                loadItems();
+                updateItemCount();
+                filterItems(currentFilter);
+                
+                // Mostrar notificação
+                showNotification(`Item "${itemName}" removido da mochila!`, 'warning');
+            }
+        }
+        
+        // Atualizar contador de itens
+        function updateItemCount() {
+            itemCountElement.textContent = items.length;
+        }
+        
+        // Resetar formulário
+        function resetForm() {
+            itemNameInput.value = '';
+            itemImageInput.value = '';
+            imagePreview.innerHTML = '<p>Nenhuma imagem selecionada</p>';
+            
+            // Resetar raridade para comum
+            rarityOptions.forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.rarity-option[data-rarity="common"]').classList.add('selected');
+            selectedRarity = 'common';
+            
+            itemNameInput.focus();
+        }
+        
+        // Obter nome da raridade
+        function getRarityName(rarity) {
+            const names = {
+                'common': 'COMUM',
+                'uncommon': 'INCOMUM',
+                'rare': 'RARO',
+                'epic': 'ÉPICO',
+                'legendary': 'LENDÁRIO',
+                'mythic': 'MÍTICO'
+            };
+            
+            return names[rarity] || 'DESCONHECIDO';
+        }
+        
+        // Obter cor da raridade
+        function getRarityColor(rarity) {
+            const colors = {
+                'common': 'var(--cyber-light)',
+                'uncommon': 'var(--cyber-green)',
+                'rare': 'var(--cyber-blue)',
+                'epic': 'var(--cyber-purple)',
+                'legendary': 'var(--cyber-yellow)',
+                'mythic': 'var(--cyber-red)'
+            };
+            
+            return colors[rarity] || 'var(--cyber-light)';
+        }
+        
+        // Obter imagem padrão baseada na raridade
+        function getDefaultImage(rarity) {
+            const defaultImages = {
+                'common': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                'uncommon': 'https://images.unsplash.com/photo-1531315630201-bb15abeb1653?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                'rare': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                'epic': 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                'legendary': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                'mythic': 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80'
+            };
+            
+            return defaultImages[rarity] || defaultImages.common;
+        }
+        
+        // Mostrar notificação
+        function showNotification(message, type) {
+            // Remover notificações anteriores
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Criar elemento da notificação
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'exclamation-triangle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Estilos da notificação
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'rgba(0, 255, 157, 0.9)' : type === 'error' ? 'rgba(255, 0, 60, 0.9)' : 'rgba(255, 239, 0, 0.9)'};
+                color: var(--cyber-dark);
+                padding: 15px 20px;
+                border-radius: 3px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // Adicionar ao corpo
+            document.body.appendChild(notification);
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+            
+            // Adicionar keyframes para animação
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            
+            document.head.appendChild(style);
+        }
+        
+        // Adicionar alguns itens de exemplo se a mochila estiver vazia
+        if (items.length === 0) {
+            // Itens de exemplo
+            const sampleItems = [
+                {
+                    id: 1,
+                    name: "Pistola de Plasma",
+                    rarity: "rare",
+                    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    date: new Date().toLocaleDateString('pt-BR')
+                },
+                {
+                    id: 2,
+                    name: "Armadura Nanotec",
+                    rarity: "epic",
+                    image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    date: new Date().toLocaleDateString('pt-BR')
+                },
+                {
+                    id: 3,
+                    name: "Óculos de Visão Noturna",
+                    rarity: "uncommon",
+                    image: "https://images.unsplash.com/photo-1531315630201-bb15abeb1653?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    date: new Date().toLocaleDateString('pt-BR')
+                },
+                {
+                    id: 4,
+                    name: "Chip Neural MKII",
+                    rarity: "legendary",
+                    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    date: new Date().toLocaleDateString('pt-BR')
+                }
+            ];
+            
+            items = sampleItems;
+            localStorage.setItem('cyberpunkInventory', JSON.stringify(items));
+            loadItems();
+            updateItemCount();
+        }
+    </script>
+</body>
+</html>
