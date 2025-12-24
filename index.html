@@ -701,8 +701,8 @@
                     <label>Senha</label>
                     <input type="password" id="password" placeholder="Digite sua senha">
                 </div>
-                <button class="btn" onclick="game.login()">Entrar</button>
-                <button class="btn" onclick="game.register()">Criar Conta</button>
+                <button class="btn" id="loginBtn">Entrar</button>
+                <button class="btn" id="registerBtn">Criar Conta</button>
             </div>
         </div>
 
@@ -725,7 +725,7 @@
                     <div class="emoji-grid" id="avatarGrid"></div>
                 </div>
 
-                <button class="btn" onclick="game.createCharacter()">Criar Personagem</button>
+                <button class="btn" id="createCharBtn">Criar Personagem</button>
             </div>
         </div>
 
@@ -894,7 +894,7 @@
                 {id: 107, name: 'Artefato Supremo', icon: '✨', attack: 60, defense: 40}
             ],
 
-            enemyAvatars: ['👹', '👺', '👻', '👽', '🤖', '🦖', '🐉', '🧟', '🧛', '🐺'],
+            enemyAvatars: ['👹', '👺', '👻', '👽', '🤖', '🦖', '🐉', '🧟', '🐺', '🦂'],
             playerAvatars: ['🦸', '🧙', '🥷', '👨‍🚀', '🤴', '👸', '🧝', '🦹', '👩‍🚀', '🧑‍🎤'],
             
             selectedAvatar: '🦸',
@@ -1112,8 +1112,8 @@
 
                 const avatar = this.enemyAvatars[Math.floor(Math.random() * this.enemyAvatars.length)];
                 const names = isBoss ? 
-                    ['Dragão Negro', 'Lorde das Trevas', 'Titã Supremo', 'Imperador Maligno', 'Guardião Ancestral'] :
-                    ['Goblin', 'Orc', 'Zumbi', 'Esqueleto', 'Troll', 'Demônio', 'Bandido', 'Lobisomem'];
+                    ['Dragão Negro', 'Lorde das Trevas', 'Titã Supremo', 'Imperador Sombrio', 'Guardião Ancestral'] :
+                    ['Goblin', 'Orc', 'Zumbi', 'Esqueleto', 'Troll', 'Bruto', 'Bandido', 'Lobisomem'];
                 
                 const name = names[Math.floor(Math.random() * names.length)];
                 const multiplier = isBoss ? 2 : 1;
@@ -1502,7 +1502,52 @@
 
         // Inicializar o jogo
         window.onload = () => {
+            console.log('Página carregada!');
             game.init();
+            
+            // Adicionar event listeners aos botões de login
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            
+            if (loginBtn) {
+                console.log('Botão de login encontrado!');
+                loginBtn.addEventListener('click', () => {
+                    console.log('Botão de login clicado!');
+                    game.login();
+                });
+            } else {
+                console.error('Botão de login NÃO encontrado!');
+            }
+            
+            if (registerBtn) {
+                console.log('Botão de registro encontrado!');
+                registerBtn.addEventListener('click', () => {
+                    console.log('Botão de registro clicado!');
+                    game.register();
+                });
+            } else {
+                console.error('Botão de registro NÃO encontrado!');
+            }
+
+            // Botão criar personagem
+            const createCharBtn = document.getElementById('createCharBtn');
+            if (createCharBtn) {
+                createCharBtn.addEventListener('click', () => {
+                    console.log('Criar personagem clicado!');
+                    game.createCharacter();
+                });
+            }
+
+            // Permitir login com Enter
+            const passwordInput = document.getElementById('password');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        console.log('Enter pressionado!');
+                        game.login();
+                    }
+                });
+            }
         };
     </script>
 </body>
