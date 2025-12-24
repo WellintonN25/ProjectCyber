@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WDev Legends - UI v9</title>
+    <title>WDev Legends - v11 Stable</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -182,26 +182,86 @@
         .card-forest { border-left: 5px solid var(--success); }
         .card-dungeon { border-left: 5px solid var(--accent); }
 
-        /* PORTAL GRID */
-        .dungeon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
-        .portal-card {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 15px 5px; text-align: center; cursor: pointer;
+        /* --- NEW DUNGEON PORTAL DESIGN --- */
+        .dungeon-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; 
+            padding: 5px;
         }
-        .portal-card.locked { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
-        .portal-lvl { font-weight: bold; font-size: 1.1rem; margin-top: 5px; }
+        .portal-card {
+            background: rgba(10, 10, 20, 0.6);
+            border: 2px solid var(--glass-border);
+            border-radius: 16px; 
+            padding: 15px; 
+            text-align: center; 
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 120px;
+        }
+        .portal-card.unlocked {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.1);
+        }
+        .portal-card.unlocked:active {
+            transform: scale(0.95);
+        }
+        .portal-card.locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+            border-color: #333;
+            cursor: not-allowed;
+        }
+        .portal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 0 5px currentColor);
+        }
+        .portal-lvl {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .portal-boss {
+            font-size: 0.7rem;
+            color: #aaa;
+            margin-top: 2px;
+        }
+        /* Portal Glow Animation */
+        @keyframes portalPulse { 0% { opacity:0.8; transform:scale(1); } 100% { opacity:1; transform:scale(1.1); } }
+        .portal-card.unlocked .portal-icon { animation: portalPulse 2s infinite alternate; }
 
-        /* BATTLE STUFF */
+
+        /* --- NEW BATTLE ANIMATIONS --- */
         .arena {
             width: 100%; height: 280px; position: relative;
             display: flex; justify-content: space-between; align-items: flex-end;
             padding: 20px 30px; margin-bottom: 10px;
         }
-        .fighter { display: flex; flex-direction: column; align-items: center; width: 80px; z-index: 5; position: relative; }
+        .fighter { display: flex; flex-direction: column; align-items: center; width: 80px; z-index: 5; position: relative; transition: transform 0.2s; }
         .fighter-emoji { font-size: 4.5rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.6)); animation: breathe 3s infinite ease-in-out; }
+        
         @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03) translateY(-5px); } }
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        /* Attack Animation (Lunge) */
+        @keyframes lungeRight { 0% { transform: translateX(0); } 30% { transform: translateX(-20px) scale(0.9); } 60% { transform: translateX(80px) scale(1.1); } 100% { transform: translateX(0); } }
+        @keyframes lungeLeft { 0% { transform: translateX(0); } 30% { transform: translateX(20px) scale(0.9); } 60% { transform: translateX(-80px) scale(1.1); } 100% { transform: translateX(0); } }
+        
+        .attack-right { animation: lungeRight 0.4s ease-in-out; }
+        .attack-left { animation: lungeLeft 0.4s ease-in-out; }
+        
+        /* Hit Animation */
+        .hit-effect { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; filter: brightness(2) sepia(1) hue-rotate(-50deg); }
         @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
+        
+        /* SCREEN SHAKE */
+        @keyframes screenShake { 0% { transform: translate(0,0); } 25% { transform: translate(5px, 5px); } 50% { transform: translate(-5px, -5px); } 75% { transform: translate(5px, -5px); } 100% { transform: translate(0,0); } }
+        .screen-shake { animation: screenShake 0.3s ease-out; }
+
+        .battle-log { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 4px; z-index: 20; align-items: center; width: 200px; pointer-events: none; }
+        .log-entry { background: rgba(0,0,0,0.6); border-radius: 12px; padding: 3px 10px; font-size: 0.7rem; color: #eee; border: 1px solid rgba(255,255,255,0.1); }
+        .log-entry.crit { color: #fbbf24; border-color: #fbbf24; font-weight: bold; }
 
         .bar-wrap { width: 100%; height: 8px; background: rgba(0,0,0,0.6); border-radius: 10px; overflow: hidden; margin-top: 8px; }
         .bar-fill { height: 100%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
@@ -209,13 +269,7 @@
         .mp-fill { background: linear-gradient(90deg, #60a5fa, #2563eb); box-shadow: 0 0 10px #60a5fa; }
         .xp-fill { background: linear-gradient(90deg, #34d399, #059669); }
 
-        .battle-log { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 4px; z-index: 20; align-items: center; width: 200px; pointer-events: none; }
-        .log-entry { background: rgba(0,0,0,0.6); border-radius: 12px; padding: 3px 10px; font-size: 0.7rem; color: #eee; border: 1px solid rgba(255,255,255,0.1); }
-        .log-entry.crit { color: #fbbf24; border-color: #fbbf24; font-weight: bold; }
-
-        /* --- NEW SKILL BUTTONS (Rounded & Icons) --- */
         .grid-skills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
-        
         .skill-btn {
             background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
             border: 1px solid rgba(255,255,255,0.15);
@@ -227,22 +281,18 @@
             height: 85px; /* Fixed height for consistency */
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        
         .skill-btn:active:not(.disabled) { transform: scale(0.95); background: rgba(255,255,255,0.15); }
         .skill-btn.disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
-        
         .skill-icon { font-size: 2rem; margin-bottom: 5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
         .skill-name { font-size: 0.7rem; font-weight: bold; color: #fff; line-height: 1.2; }
         .skill-cost { font-size: 0.65rem; color: #60a5fa; margin-top: 2px; font-weight: bold; }
 
-        /* INVENTORY (MINECRAFT STYLE) */
         .inv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px; }
         .inv-slot { aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; position: relative; transition: 0.1s; }
         .inv-slot:hover { border-color: rgba(255,255,255,0.2); }
         .inv-slot.equipped { border-color: var(--primary); box-shadow: inset 0 0 10px rgba(251,191,36,0.2); }
         .inv-qty { position: absolute; bottom: 1px; right: 2px; font-size: 0.6rem; font-weight: bold; }
         
-        /* HUD */
         .top-hud {
             display: flex; justify-content: space-between; align-items: center;
             width: 100%; margin-bottom: 20px;
@@ -250,30 +300,37 @@
             border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
         }
 
-        /* CONTROLS */
         .audio-btn { position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; border: 1px solid #555; }
         .speed-badge { position: absolute; top: 10px; left: 10px; width: 35px; height: 35px; background: var(--primary); color: #000; font-weight: 900; font-size: 0.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 50; border: 2px solid #fff; }
         .auto-indicator { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: var(--danger); padding: 2px 10px; border-radius: 10px; font-size: 0.7rem; z-index: 60; animation: pulse 1s infinite; display: none; font-weight: bold; }
         @keyframes pulse { 50% { opacity: 0.5; } }
 
-        /* MODALS */
         .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 200; display: none; align-items: center; justify-content: center; }
         .modal-box { background: #1b1b29; border: 2px solid var(--primary); border-radius: 20px; padding: 20px; width: 85%; max-width: 320px; text-align: center; display: flex; flex-direction: column; gap: 15px; max-height: 80vh; overflow-y: auto; }
         
-        /* DOCK */
         .dock { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(20,20,30,0.95); padding: 10px 25px; border-radius: 30px; display: flex; gap: 25px; border: 1px solid rgba(255,255,255,0.1); z-index: 100; width: max-content; }
         .dock.hide { display: none; }
         .dock-icon { font-size: 1.5rem; background: none; border: none; cursor: pointer; opacity: 0.6; transition: 0.2s; }
         .dock-icon.active { opacity: 1; transform: translateY(-5px); color: var(--primary); }
 
         .list-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; cursor: pointer; text-align: left; }
+        
+        /* PARTICLE SYSTEM 2.0 */
         .particle { position: fixed; pointer-events: none; z-index: 999; border-radius: 50%; }
-        .float-txt { position: absolute; font-weight: 900; font-size: 1.5rem; animation: floatUp 0.8s forwards; pointer-events: none; z-index: 10; text-align: center; width: 100px; }
-        @keyframes floatUp { to { transform:translateY(-40px); opacity: 0; } }
+        
+        .float-txt { 
+            position: absolute; font-weight: 900; font-size: 2rem; 
+            animation: floatUp 0.8s ease-out forwards; pointer-events: none; z-index: 10; text-align: center; width: 150px; 
+            text-shadow: 2px 2px 0 #000;
+        }
+        @keyframes floatUp { 
+            0% { transform:translateY(0) scale(0.5); opacity:0; } 
+            20% { transform:translateY(-10px) scale(1.2); opacity:1; } 
+            100% { transform:translateY(-60px) scale(1); opacity:0; } 
+        }
         
         #errorMsg { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; }
 
-        /* AVATAR GRID */
         .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin: 10px 0; }
         .avatar-opt { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; font-size: 2rem; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .avatar-opt.selected { border-color: var(--primary); background: rgba(251, 191, 36, 0.2); }
@@ -284,14 +341,14 @@
     <div class="bg-fx"></div>
     
     <div id="app">
-        <div class="audio-btn" id="muteBtn" onclick="game.audio.toggle()">🔊</div>
+        <div class="audio-btn" id="muteBtn" onclick="AudioSys.toggle()">🔊</div>
 
         <!-- LOGIN -->
         <div id="loginScreen" class="screen active" style="justify-content: center;">
             <div class="panel">
                 <div style="font-size: 4rem; margin-bottom: 10px;">⚔️</div>
                 <h1 style="font-size: 2rem; color: var(--primary);">WDev<br>Legends</h1>
-                <p style="color:#aaa; margin-bottom: 30px; font-size: 0.8rem;">FINAL UI v9</p>
+                <p style="color:#aaa; margin-bottom: 30px; font-size: 0.8rem;">FINAL v11</p>
                 <input type="text" id="loginUser" placeholder="Nome do Herói">
                 <input type="password" id="loginPass" placeholder="Senha">
                 <button class="btn" style="margin-top:15px" id="btnLogin" onclick="game.login()">Jogar Agora</button>
@@ -346,15 +403,19 @@
                 <div id="battleLog" class="battle-log"></div>
 
                 <div class="fighter" id="heroFighter">
-                    <div class="fighter-lvl" id="bHeroLvl">1</div>
+                    <div class="fighter-lvl" id="bHeroLvl">Lvl 1</div>
+                    <div id="floatHero" style="position:absolute; width:100%; top:0; pointer-events:none;"></div>
                     <div class="fighter-emoji" id="bHeroAv">🦸</div>
-                    <div class="bar-wrap"><div id="bHeroHp" class="bar-fill hp-fill" style="width:100%"></div></div>
-                    <div class="bar-wrap" style="height:5px; margin-top:2px"><div id="bHeroMp" class="bar-fill mp-fill" style="width:100%"></div></div>
+                    <div class="fighter-shadow"></div>
+                    <div class="bar-wrap" style="width:120%"><div id="bHeroHp" class="bar-fill hp-fill" style="width:100%"></div></div>
+                    <div class="bar-wrap" style="width:120%; height:6px; margin-top:4px;"><div id="bHeroMp" class="bar-fill mp-fill" style="width:100%"></div></div>
                 </div>
                 <div class="fighter" id="enemyFighter">
-                    <div class="fighter-lvl" id="bEnemyLvl">1</div>
+                    <div class="fighter-lvl" id="bEnemyLvl">Lvl 1</div>
+                    <div id="floatEnemy" style="position:absolute; width:100%; top:0; pointer-events:none;"></div>
                     <div class="fighter-emoji" id="bEnemyAv">🐺</div>
-                    <div class="bar-wrap"><div id="bEnemyHp" class="bar-fill hp-fill" style="width:100%"></div></div>
+                    <div class="fighter-shadow"></div>
+                    <div class="bar-wrap" style="width:120%"><div id="bEnemyHp" class="bar-fill hp-fill" style="width:100%"></div></div>
                     <small id="bEnemyName" style="font-weight:bold; margin-top:5px; display:block;">Lobo</small>
                 </div>
             </div>
@@ -371,7 +432,7 @@
 
         <!-- DUNGEON -->
         <div id="dungeonScreen" class="screen">
-            <h2 style="margin-bottom:15px;">Portais (12 Andares)</h2>
+            <h2 style="margin-bottom:15px;">Mapa de Portais</h2>
             <div id="dungeonList" class="dungeon-grid"></div>
         </div>
 
@@ -447,9 +508,9 @@
     <!-- MODALS -->
     <div id="modal" class="modal-overlay">
         <div class="modal-box">
-            <h2 id="modalTitle" style="color:var(--primary)">Title</h2>
-            <div id="modalBody">Text</div>
-            <div id="modalBtns" style="display:flex; gap:10px; justify-content:center;"></div>
+            <h2 id="modalTitle" style="color:var(--primary); margin-bottom:15px;">Aviso</h2>
+            <div id="modalBody" style="margin-bottom:25px; line-height:1.5;">Texto</div>
+            <div id="modalBtns" class="modal-actions"></div>
         </div>
     </div>
 
@@ -484,16 +545,16 @@
     </div>
 
 <script>
-// --- GAME DATA ---
-const DB_KEY = 'wdev_rpg_inv_v8'; // Using existing key for persistence
+const DB_KEY = 'wdev_rpg_inv_v11'; // NEW DB KEY
 const MAX_LEVEL = 80;
 const wait = ms => new Promise(r => setTimeout(r, ms / (game.state.speed || 1)));
 
-// AUDIO SYSTEM (SYNTHESIS)
+// AUDIO SYSTEM (SAFE MODE)
 const AudioSys = {
     ctx: null,
     masterGain: null,
     muted: false,
+    
     init() {
         if (this.ctx) return;
         try {
@@ -502,14 +563,19 @@ const AudioSys = {
             this.masterGain = this.ctx.createGain();
             this.masterGain.gain.value = 0.3; 
             this.masterGain.connect(this.ctx.destination);
-        } catch(e) { console.warn("Audio not supported"); }
+        } catch(e) { console.warn("Audio unavailable"); }
     },
-    resume() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); },
+    
+    resume() {
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    },
+    
     toggle() {
         this.muted = !this.muted;
         document.getElementById('muteBtn').textContent = this.muted ? '🔇' : '🔊';
         if (this.ctx) this.masterGain.gain.value = this.muted ? 0 : 0.3;
     },
+    
     playSFX(type) {
         if (!this.ctx || this.muted) return;
         try {
@@ -560,12 +626,15 @@ const DATA = {
         {id:'hp', n:'Poção Vida', p:100, type:'pot', i:'🍷', desc:'+100 HP'},
         {id:'mp', n:'Poção Mana', p:100, type:'pot', i:'🧪', desc:'+50 MP'},
         {id:'xpboost', n:'Poção Sabedoria', p:2000, type:'boost', rarity:'e', i:'🏺', desc:'XP x3 (5 Lutas)'},
+        
         {id:'sw1', n:'Espada Curta', atk:15, p:300, type:'eq', rarity:'c', i:'🗡️', desc:'Atk+15'},
         {id:'sh1', n:'Escudo Ferro', def:10, p:300, type:'eq', rarity:'c', i:'🛡️', desc:'Def+10'},
         {id:'ar1', n:'Armadura Leve', def:18, hp:120, p:600, type:'eq', rarity:'r', i:'🦺', desc:'Def+18 HP+120'},
         {id:'st1', n:'Cajado Arcano', atk:20, int:8, p:600, type:'eq', rarity:'r', i:'🪄', desc:'Atk+20 Int+8'},
+        
         {id:'axe1', n:'Machado Épico', atk:45, p:1800, type:'eq', rarity:'e', i:'🪓', desc:'Atk+45'},
         {id:'helm1', n:'Elmo Dourado', def:30, hp:300, p:2000, type:'eq', rarity:'e', i:'👑', desc:'Def+30 HP+300'},
+        
         {id:'god_sw', n:'Lâmina Divina', atk:120, crit:15, p:15000, type:'eq', rarity:'l', i:'⚔️', desc:'Atk+120 Crit+15%'},
         {id:'god_ar', n:'Égide Imortal', def:80, hp:1000, p:18000, type:'eq', rarity:'l', i:'🛡️', desc:'Def+80 HP+1000'}
     ],
@@ -578,12 +647,12 @@ const DATA = {
     enemies: [{n:'Rato', i:'🐀'}, {n:'Morcego', i:'🦇'}, {n:'Lobo', i:'🐺'}, {n:'Bandido', i:'🥷'}, {n:'Guarda', i:'💂‍♂️'}],
     bosses: [{n:'Golem', i:'🗿'}, {n:'General', i:'👹'}, {n:'Dragão', i:'🐉'}, {n:'Titã', i:'🤖'}],
     skills: {
-        normal:{n:'Ataque', c:0, m:1, i:'⚔️', type:'phys'}, 
-        fire:{n:'Fogo', c:20, m:1.5, i:'🔥', type:'magic', color:'orange'},
-        ice:{n:'Gelo', c:30, m:1.8, i:'❄️', type:'magic', color:'cyan'},
-        thunder:{n:'Raio', c:40, m:2.2, i:'⚡', type:'magic', color:'yellow'},
-        special:{n:'Luz', c:50, m:2.5, i:'✨', type:'magic', color:'gold'},
-        ultimate:{n:'Meteoro', c:80, m:3.5, i:'☄️', type:'magic', color:'red'}
+        normal:{n:'Hit', c:0, m:1, type:'phys'}, 
+        fire:{n:'Fogo', c:20, m:1.5, type:'magic', color:'orange'},
+        ice:{n:'Gelo', c:30, m:1.8, type:'magic', color:'cyan'},
+        thunder:{n:'Raio', c:40, m:2.2, type:'magic', color:'yellow'},
+        special:{n:'Luz', c:50, m:2.5, type:'magic', color:'gold'},
+        ultimate:{n:'Meteoro', c:80, m:3.5, type:'magic', color:'red'}
     }
 };
 
@@ -611,12 +680,14 @@ const game = {
     resetData() { if(confirm("Apagar TUDO e reiniciar?")) { localStorage.removeItem(DB_KEY); location.reload(); } },
     getU() { return this.db.users[this.db.cur] || {}; },
 
+    // --- LOGIN (SAFE) ---
     login() {
         const u = document.getElementById('loginUser').value.trim();
         const p = document.getElementById('loginPass').value.trim();
         if(!u || !p) { game.ui.showModal("Erro", "Digite nome e senha."); return; }
         
-        AudioSys.init(); AudioSys.resume();
+        // Non-blocking Audio init
+        try { AudioSys.init(); AudioSys.resume(); } catch(e){}
 
         if(!this.db.users[u]) {
             this.state.tempChar = { u, p };
@@ -624,10 +695,13 @@ const game = {
         } else {
             if(this.db.users[u].pass === p) {
                 this.db.cur = u;
+                // Auto-Fix User Data
                 const usr = this.db.users[u];
                 if(!usr.scrollSlots) usr.scrollSlots=[null,null,null];
                 if(usr.xpBoost===undefined) usr.xpBoost=0;
                 if(!usr.dungeonMax) usr.dungeonMax=1;
+                if(!usr.stats) usr.stats = {str:1, int:1, vit:1, pts:0};
+                
                 this.save();
                 this.nav('menu');
             } else game.ui.showModal("Acesso Negado", "Senha incorreta!");
@@ -686,6 +760,7 @@ const game = {
         game.battle.start('dungeon', this.state.lvl);
     },
 
+    // --- BATTLE ---
     battle: {
         async start(mode, lvl) {
             const u = game.getU();
@@ -738,9 +813,9 @@ const game = {
             game.ui.updateBattleBars(); game.ui.log('Atacou', 'turn-hero'); AudioSys.playSFX(skill.type==='phys'?'hit':'magic');
 
             const hEl = document.getElementById('heroFighter'), eEl = document.getElementById('enemyFighter');
-            hEl.style.transform = 'scale(1.2)'; setTimeout(()=>hEl.style.transform='scale(1)', 200);
+            hEl.classList.add('attack-right');
+            await wait(200); 
 
-            // DAMAGE CALC
             let str = Number(game.getU().stats.str) || 1;
             let critChance = (str * 0.01) + ((p.crit||0)/100);
             let isCrit = Math.random() < critChance;
@@ -748,21 +823,21 @@ const game = {
             let pAtk = Number(p.atk) || 10;
             let pInt = Number(p.int) || 1;
             let skillM = Number(skill.m) || 1;
-            
             let dmg = ( pAtk + (skill.c>0 ? pInt*2 : 0) ) * skillM;
             if(isCrit) { dmg *= 1.5; game.ui.log('CRIT!', 'crit'); }
             
-            let eDef = Number(e.def) || 0;
-            let finalDmg = Math.max(1, Math.floor(dmg - (eDef * 0.6)));
-            
+            let finalDmg = Math.max(1, Math.floor(dmg - ((e.def||0) * 0.6)));
             e.curHp -= finalDmg;
 
             const eRect = eEl.getBoundingClientRect();
             game.ui.spawnParticles(eRect.left+20, eRect.top+20, skill.type==='phys'?'#ef4444':(skill.color||'#fff'), skill.type==='phys'?'blood':'magic');
-
-            eEl.classList.add('shake'); game.ui.floatText('enemy', finalDmg, isCrit?'gold':'white'); 
+            eEl.classList.add('hit-effect'); 
+            game.ui.floatText('enemy', finalDmg, isCrit?'gold':'white'); 
             game.ui.updateBattleBars();
-            await new Promise(r => setTimeout(r, 400/game.state.speed)); eEl.classList.remove('shake');
+            
+            await wait(300); 
+            hEl.classList.remove('attack-right');
+            eEl.classList.remove('hit-effect');
 
             if(game.getU().scrollSlots.includes('s_double') && Math.random()<0.2 && e.curHp>0) {
                 game.ui.floatText('hero', 'TURNO EXTRA!', 'gold'); await new Promise(r=>setTimeout(r,500/game.state.speed)); game.state.busy=false; return;
@@ -770,14 +845,22 @@ const game = {
 
             if(e.curHp <= 0) { this.end(true); return; }
 
-            await new Promise(r => setTimeout(r, 500/game.state.speed));
-            game.ui.log('Defenda!', 'turn-enemy'); AudioSys.playSFX('hit');
+            await wait(400); 
+            game.ui.log('Defenda!', 'turn-enemy'); 
+            eEl.classList.add('attack-left');
+            await wait(200);
+
+            AudioSys.playSFX('hit');
             let eAtk = Number(e.atk) || 10;
             let eDmg = Math.max(1, Math.floor(eAtk - ((p.def||0)*0.6)));
             p.curHp -= eDmg;
-            hEl.classList.add('shake'); game.ui.floatText('hero', `-${eDmg}`, 'red');
+            hEl.classList.add('hit-effect'); 
+            game.ui.floatText('hero', `-${eDmg}`, 'red');
             game.ui.updateBattleBars(); 
-            await new Promise(r => setTimeout(r, 400/game.state.speed)); hEl.classList.remove('shake');
+
+            await wait(300);
+            eEl.classList.remove('attack-left');
+            hEl.classList.remove('hit-effect');
 
             if(p.curHp <= 0) this.end(false); else game.state.busy = false;
         },
@@ -791,8 +874,8 @@ const game = {
                 await new Promise(r => setTimeout(r, 600/game.state.speed));
                 let eDmg = Math.max(1, Math.floor((game.state.e.atk||10) - ((game.state.p.def||0)*0.6)));
                 game.state.p.curHp -= eDmg;
-                document.getElementById('heroFighter').classList.add('shake'); game.ui.floatText('hero', `-${eDmg}`, 'red');
-                game.ui.updateBattleBars(); await wait(400); document.getElementById('heroFighter').classList.remove('shake');
+                document.getElementById('heroFighter').classList.add('hit-effect'); game.ui.floatText('hero', `-${eDmg}`, 'red');
+                game.ui.updateBattleBars(); await wait(400); document.getElementById('heroFighter').classList.remove('hit-effect');
                 if(game.state.p.curHp <= 0) this.end(false); else game.state.busy=false;
             } else game.ui.floatText('hero', 'Vazio!', 'gray');
         },
@@ -925,17 +1008,9 @@ const game = {
             for(let i=1; i<=12; i++) {
                 const locked = i > max;
                 const boss = DATA.bosses[(i-1)%DATA.bosses.length];
-                const card = document.createElement('div'); card.className = `dungeon-item ${locked?'locked':'unlocked'}`;
-                card.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:1.5rem">${locked?'🔒':'🚪'}</span><div style="text-align:left;"><div>Andar ${i}</div><div style="font-size:0.7rem;opacity:0.7">Boss: ${boss.n}</div></div></div>`;
-                if(!locked) { 
-                    const btn = document.createElement('button');
-                    btn.className = 'btn btn-blue';
-                    btn.style.width = 'auto'; btn.style.margin = '0'; btn.style.padding = '5px 15px';
-                    btn.textContent = 'Ir';
-                    btn.onclick = (e) => { e.stopPropagation(); game.battle.start('dungeon', i); };
-                    card.appendChild(btn);
-                    card.onclick = () => game.battle.start('dungeon', i);
-                }
+                const card = document.createElement('div'); card.className = `portal-card ${locked?'locked':'unlocked'}`;
+                card.innerHTML = `<div class="portal-icon">${locked?'🔒':'🌀'}</div><div class="portal-lvl">Andar ${i}</div><div class="portal-boss">Boss: ${boss.n}</div>`;
+                if(!locked) card.onclick = () => game.battle.start('dungeon', i);
                 list.appendChild(card);
             }
         },
@@ -944,7 +1019,10 @@ const game = {
             DATA.items.forEach(it => {
                 const owned = it.type==='eq' && u.bag.includes(it.id);
                 const el = document.createElement('div'); el.className='shop-card';
-                el.style.borderColor = it.rarity==='l' ? 'gold' : (it.rarity==='e'?'violet':(it.rarity==='r'?'cyan':'#444'));
+                if(it.rarity === 'l') el.classList.add('rarity-l');
+                else if(it.rarity === 'e') el.classList.add('rarity-e');
+                else if(it.rarity === 'r') el.classList.add('rarity-r');
+                
                 el.innerHTML = `<div class="shop-card-icon">${it.i}</div><div class="shop-card-title">${it.n}</div><div class="shop-card-desc">${it.desc}</div><button class="btn ${owned?'btn-ghost':'btn-green'}" onclick="game.ui.buy('${it.id}')" ${owned?'disabled':''}>${owned?'OK':it.p}</button>`;
                 list.appendChild(el);
             });
@@ -1013,7 +1091,7 @@ const game = {
                 btn.className = `skill-btn ${cant ? 'disabled' : ''}`;
                 
                 let costHtml = s.c > 0 ? `<div class="skill-cost">${s.c} MP</div>` : '<div class="skill-cost" style="opacity:0">-</div>';
-                btn.innerHTML = `<div class="skill-icon">${s.i}</div><div class="skill-name">${s.n}</div>${costHtml}`;
+                btn.innerHTML = `<div class="skill-icon">${s.type==='phys'?'⚔️':(s.color==='red'?'☄️':(s.color==='cyan'?'❄️':(s.color==='orange'?'🔥':(s.color==='yellow'?'⚡':'✨'))))}</div><div class="skill-name">${s.n}</div>${costHtml}`;
                 
                 if(!cant) btn.onclick = () => game.battle.turn(k);
                 
