@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WDev Legends - Cross Platform</title>
+    <title>WDev Legends - Ultimate v3</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,23 +21,26 @@
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             --font-main: 'Fredoka', sans-serif;
             --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+            
+            /* Rarities */
+            --rarity-c: #a1a1aa; /* Comum */
+            --rarity-r: #60a5fa; /* Raro */
+            --rarity-e: #a855f7; /* Épico */
+            --rarity-l: #fbbf24; /* Lendário */
         }
 
         /* RESET & BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
-        
         body { 
             font-family: var(--font-main); 
-            background: #050505; /* Black framing for PC */
+            background: var(--bg-dark); 
             color: #f3f4f6; 
             height: 100vh; width: 100vw; 
             overflow: hidden; 
-            display: flex; 
-            justify-content: center; /* Center on PC */
-            align-items: center;     /* Center on PC */
+            display: flex; flex-direction: column;
         }
 
-        /* BACKGROUND FX (COVERS WHOLE SCREEN) */
+        /* BACKGROUND FX */
         .bg-fx {
             position: fixed; top:0; left:0; width:100%; height:100%; z-index: -1;
             background: var(--bg-gradient); background-size: 200% 200%;
@@ -45,37 +48,12 @@
         }
         @keyframes gradientBG { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
 
-        /* --- GAME CONTAINER (THE "PHONE" WINDOW) --- */
-        #app {
-            flex: 1; 
-            position: relative; /* Anchor for absolute elements */
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden;
-            background: rgba(0,0,0,0.2); /* Slight tint inside app */
-        }
-
-        /* PC / TABLET TWEAKS (Responsive) */
-        @media (min-width: 768px) {
-            #app {
-                width: 420px; /* Mobile width on PC */
-                height: 90vh;
-                max-height: 850px;
-                border-radius: 30px;
-                border: 4px solid rgba(255,255,255,0.1);
-                box-shadow: 0 0 60px rgba(0,0,0,0.8); /* Glow effect */
-                flex: none; /* Disable flex grow */
-            }
-            /* Custom Scrollbar for PC */
-            ::-webkit-scrollbar { width: 6px; }
-            ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        }
+        /* CONTAINERS & SCREENS */
+        #app { flex: 1; position: relative; width: 100%; height: 100%; overflow: hidden; }
         
-        /* SCREEN PAGES */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            padding: 20px; padding-bottom: 100px; /* Space for Dock */
+            padding: 20px; padding-bottom: calc(100px + var(--safe-area-bottom));
             overflow-y: auto; overflow-x: hidden;
             opacity: 0; pointer-events: none; transform: scale(0.98);
             transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -117,7 +95,7 @@
         }
         input:focus { border-color: var(--primary); background: rgba(0,0,0,0.6); }
 
-        /* INVENTORY GRID */
+        /* MINECRAFT STYLE INVENTORY */
         .inv-grid {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
             width: 100%; max-width: 480px; padding: 10px;
@@ -134,6 +112,12 @@
         .inv-slot.equipped { border-color: var(--primary); background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
         .inv-slot.empty { opacity: 0.3; cursor: default; }
         .inv-qty { position: absolute; bottom: 2px; right: 4px; font-size: 0.7rem; font-weight: bold; color: #fff; text-shadow: 1px 1px 0 #000; }
+        
+        /* RARITY BORDERS IN INV */
+        .inv-slot.rarity-c { border-color: var(--rarity-c); }
+        .inv-slot.rarity-r { border-color: var(--rarity-r); box-shadow: inset 0 0 5px var(--rarity-r); }
+        .inv-slot.rarity-e { border-color: var(--rarity-e); box-shadow: inset 0 0 8px var(--rarity-e); }
+        .inv-slot.rarity-l { border-color: var(--rarity-l); box-shadow: inset 0 0 10px var(--rarity-l); }
 
         /* SHOP GRID */
         .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 480px; }
@@ -143,6 +127,10 @@
             padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;
             position: relative; overflow: hidden;
         }
+        .shop-card.rarity-r { border-color: var(--rarity-r); box-shadow: 0 0 15px rgba(96,165,250,0.1); }
+        .shop-card.rarity-e { border-color: var(--rarity-e); box-shadow: 0 0 15px rgba(168,85,247,0.15); }
+        .shop-card.rarity-l { border-color: var(--rarity-l); box-shadow: 0 0 15px rgba(251,191,36,0.2); }
+        
         .shop-card-icon { font-size: 2.5rem; margin-bottom: 5px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3)); }
         .shop-card-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; }
         .shop-card-desc { font-size: 0.7rem; color: #9ca3af; margin-bottom: 10px; height: 20px; overflow: hidden;}
@@ -198,6 +186,12 @@
             border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
         }
 
+        /* BOOST INDICATOR */
+        .boost-active {
+            font-size: 0.8rem; color: var(--rarity-e); font-weight: bold;
+            animation: pulse 1.5s infinite; text-transform: uppercase;
+        }
+
         /* BATTLE SCENE */
         .arena {
             width: 100%; height: 260px; position: relative;
@@ -228,7 +222,7 @@
         @keyframes particleGravity { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0.5); opacity: 0; } }
         @keyframes particleBang { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
 
-        /* BATTLE LOG (DISCRETO) */
+        /* BATTLE LOG */
         .battle-log {
             position: absolute; 
             top: 20px; left: 50%; transform: translateX(-50%);
@@ -288,9 +282,9 @@
         .avatar-opt { font-size: 2.5rem; background: rgba(255,255,255,0.1); border-radius: 12px; cursor: pointer; padding: 10px; transition: 0.2s; border: 2px solid transparent; }
         .avatar-opt.selected { border-color: var(--primary); background: rgba(251, 191, 36, 0.2); transform: scale(1.1); }
 
-        /* CONTROLS (CHANGED TO ABSOLUTE TO STICK INSIDE APP ON PC) */
+        /* CONTROLS (SPEED/AUDIO) */
         .audio-btn {
-            position: absolute; top: 15px; right: 15px; z-index: 101;
+            position: fixed; top: 15px; right: 15px; z-index: 101;
             background: rgba(0,0,0,0.6); color: #fff; font-size: 0.9rem;
             width: 30px; height: 30px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; cursor: pointer;
@@ -316,15 +310,14 @@
         }
         @keyframes pulse { 0% { opacity:0.8; } 50% { opacity:1; } 100% { opacity:0.8; } }
 
-        /* DOCK NAVIGATION (CHANGED TO ABSOLUTE) */
+        /* DOCK NAVIGATION */
         .dock {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: var(--safe-area-bottom); left: 50%; transform: translateX(-50%);
             background: rgba(15, 12, 41, 0.9); backdrop-filter: blur(20px);
             padding: 12px 25px; border-radius: 35px;
             display: flex; gap: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.1); z-index: 100;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: max-content; /* Ensure it fits content */
         }
         .dock.hide { transform: translate(-50%, 150%); }
         .dock-icon {
@@ -338,12 +331,11 @@
             width: 5px; height: 5px; background: var(--primary); border-radius: 50%;
         }
 
-        /* MODALS (CHANGED TO ABSOLUTE) */
+        /* MODALS */
         .modal-overlay {
-            position: absolute; top:0; left:0; width:100%; height:100%;
+            position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
             z-index: 200; display: none; align-items: center; justify-content: center;
-            border-radius: 30px; /* Match app radius */
         }
         .modal-box {
             background: #1e1b4b; border: 2px solid var(--primary);
@@ -358,6 +350,22 @@
         }
         .modal-actions button { flex: 1; }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* SCROLL LIST ITEMS */
+        .scroll-item-row {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+            padding: 10px; border-radius: 10px; margin-bottom: 5px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .scroll-item-row:active { background: rgba(255,255,255,0.08); }
+        .scroll-item-icon { font-size: 1.5rem; }
+        .scroll-item-info { flex: 1; text-align: left; }
+        .scroll-rarity-c { color: var(--rarity-c); }
+        .scroll-rarity-r { color: var(--rarity-r); text-shadow: 0 0 5px rgba(96,165,250,0.3); }
+        .scroll-rarity-l { color: var(--rarity-l); text-shadow: 0 0 8px rgba(251,191,36,0.4); }
+        .scroll-stats { font-size: 0.7rem; color: #aaa; margin-top: 2px; }
+        .scroll-desc { font-size: 0.7rem; color: #888; font-style: italic; display: block; margin-top: 2px;}
 
         /* UTILS */
         .text-gold { color: var(--primary); }
@@ -380,7 +388,7 @@
             <div class="panel">
                 <div style="font-size: 4rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4));">⚔️</div>
                 <h1 style="font-size: 2.2rem; color: var(--primary); line-height: 1.1; margin-bottom: 5px;">WDev<br>Legends</h1>
-                <p style="color:#9ca3af; margin-bottom: 30px; font-size: 0.9rem; letter-spacing: 2px;">PRO PLUS</p>
+                <p style="color:#9ca3af; margin-bottom: 30px; font-size: 0.9rem; letter-spacing: 2px;">ULTIMATE v3</p>
                 <input type="text" id="loginUser" placeholder="Nome do Herói" autocomplete="off">
                 <input type="password" id="loginPass" placeholder="Senha Secreta">
                 <button class="btn" onclick="game.login()">Jogar Agora</button>
@@ -404,6 +412,7 @@
                     <div id="homeXp" class="bar-fill xp-fill" style="width:0%;"></div>
                 </div>
                 <p style="font-size: 0.8rem; color: #aaa; margin-top:5px;">Experiência</p>
+                <div id="homeBoost" class="boost-active" style="display:none; margin-top:5px;">XP x3 ATIVO!</div>
             </div>
 
             <div style="width:100%; max-width:480px; display:flex; flex-direction:column; gap:15px;">
@@ -411,7 +420,7 @@
                     <div class="adventure-card-icon">🌲</div>
                     <div class="adventure-card-content">
                         <h3>Explorar Floresta</h3>
-                        <p>Enfrente monstros para ganhar Ouro e XP.</p>
+                        <p>Ganhe Ouro e XP.</p>
                     </div>
                     <div class="adventure-card-bg">⚔️</div>
                 </div>
@@ -419,7 +428,7 @@
                     <div class="adventure-card-icon">🏰</div>
                     <div class="adventure-card-content">
                         <h3>Masmorras</h3>
-                        <p>Desafie chefes para obter Itens Raros.</p>
+                        <p>Busque Pergaminhos Raros.</p>
                     </div>
                     <div class="adventure-card-bg">💀</div>
                 </div>
@@ -432,8 +441,6 @@
             <div class="arena">
                 <div class="speed-badge" id="speedToggle" onclick="game.toggleSpeed()">1x</div>
                 <div class="auto-indicator" id="autoInd">AUTO: 5</div>
-                
-                <!-- BATTLE LOG RIBBON (Top Center) -->
                 <div id="battleLog" class="battle-log"></div>
 
                 <div class="fighter" id="heroFighter">
@@ -503,7 +510,7 @@
                 </div>
             </div>
             
-            <h3 style="margin-bottom:10px;">Pergaminhos (Slots)</h3>
+            <h3 style="margin-bottom:10px;">Pergaminhos</h3>
             <div style="display:flex; gap:15px; justify-content:center; margin-bottom:15px;">
                 <div class="inv-slot" id="slot0" onclick="game.char.openSlot(0)" style="width:70px;"></div>
                 <div class="inv-slot" id="slot1" onclick="game.char.openSlot(1)" style="width:70px;"></div>
@@ -573,7 +580,7 @@
     <div id="scrollModal" class="modal-overlay">
         <div class="modal-box">
             <h3 style="margin-bottom:15px;">Equipar Pergaminho</h3>
-            <div id="scrollList" style="max-height:200px; overflow-y:auto; text-align:left; width:100%;"></div>
+            <div id="scrollList" style="max-height:250px; overflow-y:auto; text-align:left; width:100%; padding-right:5px;"></div>
             <div class="modal-actions">
                 <button class="btn btn-ghost" onclick="document.getElementById('scrollModal').style.display='none'">Cancelar</button>
                 <button class="btn btn-red" onclick="game.char.unequipScroll()">Remover</button>
@@ -582,41 +589,55 @@
     </div>
 
 <script>
-    const DB_KEY = 'wdev_rpg_proplus';
+    const DB_KEY = 'wdev_rpg_ult_v3';
     const wait = ms => new Promise(r => setTimeout(r, ms / (game.state.speed || 1)));
     const MAX_LEVEL = 80;
 
+    // --- DATA ---
     const DATA = {
         avatars: ['🦸', '🥷', '🧙', '🧝', '👮', '🧟', '🧚', '🧞'],
         items: [
-            {id:'hp', n:'Poção Vida', p:50, type:'pot', i:'🍷', desc:'Cura 100 HP'},
-            {id:'mp', n:'Poção Mana', p:50, type:'pot', i:'🧪', desc:'Recupera 50 MP'},
-            {id:'sw1', n:'Espada Curta', atk:10, p:150, type:'eq', i:'🗡️', desc:'Atk +10'},
-            {id:'sh1', n:'Escudo Ferro', def:8, p:150, type:'eq', i:'🛡️', desc:'Def +8'},
-            {id:'st1', n:'Cajado Arcano', atk:15, int:5, p:400, type:'eq', i:'🪄', desc:'Atk +15, Int +5'},
-            {id:'ar1', n:'Armadura Leve', def:15, hp:100, p:400, type:'eq', i:'🦺', desc:'Def +15, HP +100'},
-            {id:'kng', n:'Excalibur', atk:60, p:5000, type:'eq', i:'👑', desc:'Lendária'},
-            {id:'tri', n:'Tridente', atk:70, p:8000, type:'eq', i:'🔱', desc:'Divino'}
+            // Potions & Boosts
+            {id:'hp', n:'Poção Vida', p:100, type:'pot', i:'🍷', desc:'Cura 100 HP'},
+            {id:'mp', n:'Poção Mana', p:100, type:'pot', i:'🧪', desc:'Recupera 50 MP'},
+            {id:'xpboost', n:'Poção da Sabedoria', p:2000, type:'boost', rarity:'e', i:'🏺', desc:'XP x3 por 5 batalhas!'},
+
+            // Common/Rare
+            {id:'sw1', n:'Espada Curta', atk:15, p:300, type:'eq', rarity:'c', i:'🗡️', desc:'Atk +15'},
+            {id:'sh1', n:'Escudo Ferro', def:10, p:300, type:'eq', rarity:'c', i:'🛡️', desc:'Def +10'},
+            {id:'st1', n:'Cajado Arcano', atk:20, int:8, p:600, type:'eq', rarity:'r', i:'🪄', desc:'Atk +20, Int +8'},
+            {id:'ar1', n:'Armadura Leve', def:18, hp:120, p:600, type:'eq', rarity:'r', i:'🦺', desc:'Def +18, HP +120'},
+            {id:'hlm1', n:'Elmo de Ferro', def:12, p:450, type:'eq', rarity:'c', i:'🪖', desc:'Def +12'},
+            {id:'bts1', n:'Botas de Couro', def:6, hp:60, p:350, type:'eq', rarity:'c', i:'👢', desc:'Def +6, HP +60'},
+            
+            // Epic
+            {id:'axe1', n:'Machado Guerra', atk:40, p:1500, type:'eq', rarity:'e', i:'🪓', desc:'Atk +40. Pesado.'},
+            {id:'bow1', n:'Arco Élfico', atk:35, crit:8, p:1800, type:'eq', rarity:'e', i:'🏹', desc:'Atk +35, Crit +8%'},
+            {id:'rng1', n:'Anel de Titã', hp:400, p:2000, type:'eq', rarity:'e', i:'💍', desc:'HP +400'},
+            {id:'helm_void', n:'Elmo do Vazio', def:25, int:15, p:2500, type:'eq', rarity:'e', i:'🔮', desc:'Def +25, Int +15'},
+
+            // Legendary
+            {id:'kng', n:'Excalibur', atk:100, crit:10, p:15000, type:'eq', rarity:'l', i:'👑', desc:'Lendária. Atk +100'},
+            {id:'tri', n:'Tridente', atk:110, p:18000, type:'eq', rarity:'l', i:'🔱', desc:'Divino. Atk +110'},
+            {id:'arm_drag', n:'Armadura Dragão', def:50, hp:500, p:20000, type:'eq', rarity:'l', i:'🐉', desc:'Def +50, HP +500'},
+            {id:'sw_god', n:'Lâmina do Infinito', atk:150, crit:15, p:30000, type:'eq', rarity:'l', i:'⚔️', desc:'Poder absoluto.'}
         ],
         scrolls: [
-            {id:'s_f1', n:'Chama Menor', t:'fire', atk:5, i:'📜'},
-            {id:'s_w1', n:'Maré Alta', t:'water', hp:50, i:'📜'},
-            {id:'s_v1', n:'Brisa Leve', t:'wind', def:5, i:'📜'},
-            {id:'s_f2', n:'Supernova', t:'fire', atk:25, i:'📜'},
+            // Common
+            {id:'s_c_atk', n:'Perg. Força I', rarity:'c', atk:5, def:0, crit:0, i:'📜', desc:'Aumenta um pouco o ataque.'},
+            {id:'s_c_def', n:'Perg. Defesa I', rarity:'c', atk:0, def:5, crit:0, i:'📜', desc:'Aumenta um pouco a defesa.'},
+            // Rare
+            {id:'s_r_fire', n:'Perg. Fogo II', rarity:'r', atk:15, def:0, crit:2, i:'📜', t:'fire', desc:'Dano de fogo e chance crítica.'},
+            {id:'s_r_ice', n:'Perg. Gelo II', rarity:'r', atk:5, def:10, crit:0, i:'📜', t:'water', desc:'Defesa sólida e poder gelado.'},
+            // Legendary
+            {id:'s_l_crit', n:'Olho de Águia', rarity:'l', atk:25, def:0, crit:10, i:'📜', t:'wind', desc:'Ataque massivo e crítico mortal.'},
+            {id:'s_double', n:'Surto de Tempo', rarity:'l', atk:10, def:5, crit:5, i:'📜', proc:'double', desc:'20% chance de atacar 2x seguidas!'},
         ],
-        // FIXED CHARACTER ICONS
         enemies: [
-            {n:'Rato Gigante', i:'🐀'},
-            {n:'Morcego', i:'🦇'},
-            {n:'Lobo Feroz', i:'🐺'},
-            {n:'Bandido', i:'🥷'}, // Ninja for Bandit
-            {n:'Soldado', i:'💂‍♂️'}   // Guardsman for Soldier
+            {n:'Rato Gigante', i:'🐀'}, {n:'Morcego', i:'🦇'}, {n:'Lobo Feroz', i:'🐺'}, {n:'Bandido', i:'🥷'}, {n:'Soldado', i:'💂‍♂️'}
         ],
         bosses: [
-            {n:'Golem Pedra', i:'🗿'},
-            {n:'General Caos', i:'👹'}, // Oni for General
-            {n:'Dragão Ancião', i:'🐉'},
-            {n:'Titã Blindado', i:'🤖'}
+            {n:'Golem Pedra', i:'🗿'}, {n:'General Caos', i:'👹'}, {n:'Dragão Ancião', i:'🐉'}, {n:'Titã Blindado', i:'🤖'}
         ],
         skills: {
             normal: {n:'Ataque', c:0, m:1, i:'⚔️', type:'phys'},
@@ -636,383 +657,257 @@
             const s = localStorage.getItem(DB_KEY);
             if(s) this.db = JSON.parse(s);
             if(this.db.cur && this.db.users[this.db.cur]) this.nav('menu');
-            document.body.addEventListener('click', () => {
-                if(game.audio.ctx && game.audio.ctx.state === 'suspended') game.audio.ctx.resume();
-            }, {once:false}); 
+            document.body.addEventListener('click', () => { if(game.audio.ctx && game.audio.ctx.state === 'suspended') game.audio.ctx.resume(); }, {once:false}); 
         },
 
         save() { localStorage.setItem(DB_KEY, JSON.stringify(this.db)); },
         getU() { return this.db.users[this.db.cur]; },
 
         toggleSpeed() {
-            this.state.speed = (this.state.speed >= 3) ? 1 : this.state.speed + 1;
+            const u = game.getU();
+            let maxSpeed = 3;
+            if(u.lvl >= 10) maxSpeed = 4;
+            if(u.lvl >= 20) maxSpeed = 5;
+            this.state.speed = (this.state.speed >= maxSpeed) ? 1 : this.state.speed + 1;
             document.getElementById('speedToggle').textContent = this.state.speed + 'x';
             game.ui.floatText('hero', `Speed ${this.state.speed}x`, '#fff');
         },
 
         startAutoFarm() {
             this.state.autoRuns = 5;
-            this.state.speed = 3;
-            document.getElementById('speedToggle').textContent = '3x';
+            this.state.speed = (game.getU().lvl >= 20) ? 5 : 3;
+            document.getElementById('speedToggle').textContent = this.state.speed + 'x';
             game.ui.closeModal();
             game.battle.start('dungeon', this.state.lvl);
         },
 
-        // --- AUDIO SYSTEM (SFX ONLY) ---
+        // --- AUDIO SYSTEM ---
         audio: {
             ctx: null,
-            init() {
-                try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioContext();
-                } catch(e) { console.log('Audio init fail'); }
-            },
-            toggle() {
-                game.state.muted = !game.state.muted;
-                document.getElementById('muteBtn').textContent = game.state.muted ? '🔇' : '🔊';
-            },
+            init() { try { const AC = window.AudioContext||window.webkitAudioContext; this.ctx = new AC(); } catch(e){} },
+            toggle() { game.state.muted = !game.state.muted; document.getElementById('muteBtn').textContent = game.state.muted ? '🔇' : '🔊'; },
             playSFX(type) {
                 if(!this.ctx || game.state.muted) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
+                const osc = this.ctx.createOscillator(); const g = this.ctx.createGain();
+                osc.connect(g); g.connect(this.ctx.destination);
                 const now = this.ctx.currentTime;
                 if(type === 'hit') {
-                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now); osc.stop(now + 0.15);
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.exponentialRampToValueAtTime(0.01, now+0.15);
+                    g.gain.setValueAtTime(0.4, now); g.gain.exponentialRampToValueAtTime(0.01, now+0.15);
+                    osc.start(now); osc.stop(now+0.15);
                 } else if(type === 'magic') {
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(900, now + 0.3);
-                    gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now); osc.stop(now + 0.3);
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(900, now+0.3);
+                    g.gain.setValueAtTime(0.2, now); g.gain.linearRampToValueAtTime(0.01, now+0.3);
+                    osc.start(now); osc.stop(now+0.3);
                 } else if(type === 'win') {
-                    [523.25, 659.25, 783.99].forEach((freq, i) => {
-                        const o = this.ctx.createOscillator(); const g = this.ctx.createGain(); o.connect(g); g.connect(this.ctx.destination);
-                        o.type = 'triangle'; o.frequency.value = freq; g.gain.setValueAtTime(0.1, now + i*0.1); g.gain.linearRampToValueAtTime(0, now + i*0.1 + 0.4);
-                        o.start(now + i*0.1); o.stop(now + i*0.1 + 0.4);
+                    [523, 659, 783].forEach((f, i) => {
+                        const o = this.ctx.createOscillator(); const gn = this.ctx.createGain();
+                        o.connect(gn); gn.connect(this.ctx.destination); o.type = 'triangle'; o.frequency.value = f;
+                        gn.gain.setValueAtTime(0.1, now+i*0.1); gn.gain.linearRampToValueAtTime(0, now+i*0.1+0.4);
+                        o.start(now+i*0.1); o.stop(now+i*0.1+0.4);
                     });
                 }
             }
         },
 
+        // --- LOGIC ---
         async login() {
             const u = document.getElementById('loginUser').value.trim();
             const p = document.getElementById('loginPass').value.trim();
             if(!u || !p) { game.ui.showModal("Erro", "Digite nome e senha."); return; }
             if(!game.audio.ctx) game.audio.init();
-
-            if(!this.db.users[u]) {
-                this.state.newCharData = { u, p };
-                game.ui.openAvatarSelect();
-            } else {
-                if(this.db.users[u].pass === p) {
-                    this.db.cur = u;
-                    if(!this.db.users[u].scrollSlots) this.db.users[u].scrollSlots = [null,null,null];
-                    this.save();
-                    this.nav('menu');
-                } else game.ui.showModal("Acesso Negado", "Senha incorreta!");
-            }
+            if(!this.db.users[u]) { this.state.newCharData = { u, p }; game.ui.openAvatarSelect(); } 
+            else if(this.db.users[u].pass === p) { 
+                this.db.cur = u; 
+                if(!this.db.users[u].scrollSlots) this.db.users[u].scrollSlots = [null,null,null]; 
+                if(this.db.users[u].xpBoost === undefined) this.db.users[u].xpBoost = 0; // Init boost
+                this.save(); this.nav('menu'); 
+            } 
+            else game.ui.showModal("Acesso", "Senha incorreta!");
         },
-
         createChar() {
-            const data = this.state.newCharData;
-            if(!data) return;
-            const selectedAv = document.querySelector('.avatar-opt.selected');
-            const avatar = selectedAv ? selectedAv.textContent : '🦸';
-            this.db.users[data.u] = {
-                pass: data.p, name: data.u, av: avatar, lvl: 1, xp: 0, gold: 100,
-                inv: {hp:2, mp:1}, bag: [], equip: [], scrolls: [], scrollSlots: [null, null, null],
-                stats: {str:1, int:1, vit:1, pts:0}, dungeonMax: 1
-            };
-            this.db.cur = data.u;
-            this.save();
-            document.getElementById('createModal').style.display = 'none';
-            this.nav('menu');
+            const d = this.state.newCharData; if(!d) return;
+            const av = document.querySelector('.avatar-opt.selected')?.textContent || '🦸';
+            this.db.users[d.u] = { pass: d.p, name: d.u, av: av, lvl: 1, xp: 0, gold: 100, inv: {hp:2, mp:1}, bag: [], equip: [], scrolls: [], scrollSlots: [null,null,null], stats: {str:1, int:1, vit:1, pts:0}, dungeonMax: 1, xpBoost: 0 };
+            this.db.cur = d.u; this.save(); document.getElementById('createModal').style.display = 'none'; this.nav('menu');
         },
-
         logout() { this.db.cur = null; location.reload(); },
-
-        nav(screenId) {
-            if(this.state.inBattle && screenId !== 'battle') return; 
+        nav(id) {
+            if(this.state.inBattle && id !== 'battle') return; 
             document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById(screenId+'Screen').classList.add('active');
-            
+            document.getElementById(id+'Screen').classList.add('active');
             const dock = document.getElementById('navDock');
-            const isLoggedIn = !!this.db.cur && screenId !== 'login';
-            if(isLoggedIn && screenId !== 'battle') {
-                dock.classList.remove('hide');
-                document.querySelectorAll('.dock-icon').forEach(b => b.classList.remove('active'));
-                const btn = document.getElementById('nav_'+screenId);
-                if(btn) btn.classList.add('active');
-            } else dock.classList.add('hide');
-
-            if(screenId === 'menu') game.ui.renderHome();
-            if(screenId === 'shop') game.ui.renderShop();
-            if(screenId === 'inv') game.ui.renderInv();
-            if(screenId === 'char') game.char.render();
-            if(screenId === 'dungeon') game.ui.renderDungeon();
+            const logged = !!this.db.cur && id !== 'login';
+            if(logged && id !== 'battle') { dock.classList.remove('hide'); document.querySelectorAll('.dock-icon').forEach(b => b.classList.remove('active')); document.getElementById('nav_'+id).classList.add('active'); } else dock.classList.add('hide');
+            if(id === 'menu') game.ui.renderHome();
+            if(id === 'shop') game.ui.renderShop();
+            if(id === 'inv') game.ui.renderInv();
+            if(id === 'char') game.char.render();
+            if(id === 'dungeon') game.ui.renderDungeon();
         },
 
+        // --- BATTLE ---
         battle: {
             async start(mode, lvl=1) {
-                const u = game.getU();
-                game.state.mode = mode;
-                game.state.lvl = lvl;
-                game.state.inBattle = true;
-                game.state.busy = false;
-
-                // Clear log
+                const u = game.getU(); game.state.mode = mode; game.state.lvl = lvl; game.state.inBattle = true; game.state.busy = false;
                 document.getElementById('battleLog').innerHTML = '';
-
                 if(game.state.autoRuns > 0) {
-                    document.getElementById('autoInd').style.display = 'block';
-                    document.getElementById('autoInd').textContent = `AUTO: ${game.state.autoRuns}`;
+                    document.getElementById('autoInd').style.display = 'block'; document.getElementById('autoInd').textContent = `AUTO: ${game.state.autoRuns}`;
                     setTimeout(() => game.battle.autoLoop(), 1000/game.state.speed);
                 } else document.getElementById('autoInd').style.display = 'none';
 
                 const stats = game.calcStats();
-                game.state.p = { ...stats.s, curHp: stats.s.hp, curMp: stats.s.mp, maxHp: stats.s.hp, maxMp: stats.s.mp };
+                game.state.p = { ...stats.s, curHp: stats.s.hp, curMp: stats.s.mp, maxHp: stats.s.hp, maxMp: stats.s.mp, crit: stats.s.crit, scrollEff: stats.sets };
 
-                let enemyData, mult = 1, enemyLvl = 1;
+                let eData, mult = 1, eLvl = 1;
                 if(mode === 'dungeon') {
-                    let idx = (lvl - 1) % DATA.bosses.length;
-                    enemyData = DATA.bosses[idx];
-                    enemyLvl = lvl * 2;
-                    mult = 1.5 + (lvl * 0.6);
+                    let idx = (lvl - 1) % DATA.bosses.length; eData = DATA.bosses[idx]; eLvl = lvl * 2; mult = 1.5 + (lvl * 0.6);
                 } else {
-                    enemyData = DATA.enemies[Math.floor(Math.random() * DATA.enemies.length)];
-                    enemyLvl = Math.max(1, u.lvl + Math.floor(Math.random() * 2));
-                    mult = 1 + (u.lvl * 0.15);
+                    eData = DATA.enemies[Math.floor(Math.random() * DATA.enemies.length)]; eLvl = Math.max(1, u.lvl + Math.floor(Math.random()*2)); mult = 1 + (u.lvl * 0.15);
                 }
+                game.state.e = { name: eData.n, av: eData.i, lvl: eLvl, maxHp: Math.floor((120+lvl*20)*mult), curHp: Math.floor((120+lvl*20)*mult), atk: Math.floor((12+lvl*2)*mult), def: Math.floor((2+lvl)*mult) };
 
-                game.state.e = {
-                    name: enemyData.n, av: enemyData.i, lvl: enemyLvl,
-                    maxHp: Math.floor((120 + lvl * 20) * mult),
-                    curHp: Math.floor((120 + lvl * 20) * mult),
-                    atk: Math.floor((12 + lvl * 2) * mult),
-                    def: Math.floor((2 + lvl) * mult)
-                };
-
-                document.getElementById('bHeroAv').textContent = u.av;
-                document.getElementById('bHeroLvl').textContent = 'Lvl ' + u.lvl;
-                document.getElementById('bEnemyAv').textContent = game.state.e.av;
-                document.getElementById('bEnemyName').textContent = game.state.e.name;
-                document.getElementById('bEnemyLvl').textContent = 'Lvl ' + game.state.e.lvl;
-
-                game.ui.renderBattleSkills();
-                game.ui.updateBattleBars();
-                game.nav('battle');
-                game.ui.log('Início', 'turn-hero');
+                document.getElementById('bHeroAv').textContent = u.av; document.getElementById('bHeroLvl').textContent = 'Lvl '+u.lvl;
+                document.getElementById('bEnemyAv').textContent = game.state.e.av; document.getElementById('bEnemyName').textContent = game.state.e.name; document.getElementById('bEnemyLvl').textContent = 'Lvl '+game.state.e.lvl;
+                game.ui.renderBattleSkills(); game.ui.updateBattleBars(); game.nav('battle'); game.ui.log('Início', 'turn-hero');
             },
-
             autoLoop() {
                 if(!game.state.inBattle) return;
-                const mp = game.state.p.curMp;
-                let skill = 'normal';
-                if(mp >= DATA.skills.ultimate.c) skill = 'ultimate';
-                else if(mp >= DATA.skills.special.c) skill = 'special';
-                else if(mp >= DATA.skills.thunder.c) skill = 'thunder';
-                else if(mp >= DATA.skills.fire.c) skill = 'fire';
-                
-                game.battle.turn(skill).then(() => {
-                    if(game.state.inBattle && game.state.autoRuns > 0) setTimeout(() => game.battle.autoLoop(), 1500/game.state.speed);
-                });
+                const mp = game.state.p.curMp; let skill = 'normal';
+                if(mp >= DATA.skills.ultimate.c) skill = 'ultimate'; else if(mp >= DATA.skills.special.c) skill = 'special'; else if(mp >= DATA.skills.thunder.c) skill = 'thunder'; else if(mp >= DATA.skills.fire.c) skill = 'fire';
+                game.battle.turn(skill).then(() => { if(game.state.inBattle && game.state.autoRuns > 0) setTimeout(() => game.battle.autoLoop(), 1500/game.state.speed); });
             },
-
             async turn(type) {
-                if(game.state.busy) return;
-                game.state.busy = true;
-                const p = game.state.p;
-                const e = game.state.e;
-                const skill = DATA.skills[type];
-
-                if(p.curMp < skill.c) { 
-                    if(game.state.autoRuns > 0) type = 'normal'; 
-                    else { game.ui.floatText('hero', 'Sem Mana!', '#60a5fa'); game.state.busy = false; return; }
-                }
+                if(game.state.busy) return; game.state.busy = true;
+                const p = game.state.p; const e = game.state.e; const skill = DATA.skills[type];
+                if(p.curMp < skill.c) { if(game.state.autoRuns > 0) type = 'normal'; else { game.ui.floatText('hero', 'Sem Mana!', '#60a5fa'); game.state.busy = false; return; } }
                 
                 if(type !== 'normal') p.curMp -= skill.c;
-                game.ui.updateBattleBars();
-                game.ui.log('Herói', 'turn-hero');
-                game.audio.playSFX(skill.type === 'phys' ? 'hit' : 'magic');
+                game.ui.updateBattleBars(); game.ui.log('Herói', 'turn-hero'); game.audio.playSFX(skill.type==='phys'?'hit':'magic');
 
-                const hEl = document.getElementById('heroFighter');
-                const eEl = document.getElementById('enemyFighter');
-                hEl.style.transition = 'transform ' + (0.1/game.state.speed) + 's';
-                hEl.style.transform = 'scale(1.1) translateX(60px)';
-                await wait(150);
-                hEl.style.transform = 'scale(1) translateX(0)';
-                hEl.style.transition = 'transform ' + (0.3/game.state.speed) + 's';
+                const hEl = document.getElementById('heroFighter'); const eEl = document.getElementById('enemyFighter');
+                hEl.style.transition = `transform ${0.1/game.state.speed}s`; hEl.style.transform = 'scale(1.1) translateX(60px)';
+                await wait(150); hEl.style.transform = 'scale(1) translateX(0)'; hEl.style.transition = `transform ${0.3/game.state.speed}s`;
 
-                const eRect = eEl.getBoundingClientRect();
-                const cx = eRect.left + eRect.width/2; const cy = eRect.top + eRect.height/2;
-                if(skill.type === 'phys') game.ui.spawnParticles(cx, cy, '#ef4444', 'blood');
-                else game.ui.spawnParticles(cx, cy, skill.color || '#fff', 'magic');
+                const eRect = eEl.getBoundingClientRect(); const cx = eRect.left + eRect.width/2; const cy = eRect.top + eRect.height/2;
+                game.ui.spawnParticles(cx, cy, skill.type==='phys'?'#ef4444':(skill.color||'#fff'), skill.type==='phys'?'blood':'magic');
 
-                let isCrit = Math.random() < (game.getU().stats.str * 0.02);
+                let isCrit = Math.random() < ( (game.getU().stats.str * 0.02) + (p.crit/100) );
                 let dmgRaw = (p.atk + (skill.c > 0 ? p.int * 2 : 0)) * skill.m;
                 if(isCrit) { dmgRaw *= 1.5; game.ui.log('CRÍTICO!', 'crit'); }
-                let dmg = Math.floor(dmgRaw - e.def);
-                if(dmg < 1) dmg = 1;
+                let dmg = Math.floor(dmgRaw - e.def); if(dmg < 1) dmg = 1;
 
-                eEl.classList.add('shake');
-                game.ui.floatText('enemy', dmg + (isCrit ? ' 💥' : ''), isCrit ? '#fbbf24' : '#fff');
-                e.curHp -= dmg;
-                game.ui.updateBattleBars();
-                await wait(400);
-                eEl.classList.remove('shake');
+                eEl.classList.add('shake'); game.ui.floatText('enemy', dmg + (isCrit?' 💥':''), isCrit?'#fbbf24':'#fff'); e.curHp -= dmg;
+                game.ui.updateBattleBars(); await wait(400); eEl.classList.remove('shake');
+
+                if(game.getU().scrollSlots.includes('s_double') && Math.random() < 0.2 && e.curHp > 0) {
+                    game.ui.floatText('hero', 'TURNO EXTRA!', '#fbbf24'); game.ui.log('Surto de Tempo!', 'crit'); await wait(500); game.state.busy = false; return;
+                }
 
                 if(e.curHp <= 0) { await wait(500); this.end(true); return; }
 
-                // ENEMY TURN
-                await wait(500);
-                game.ui.log('Inimigo', 'turn-enemy');
-                eEl.style.transition = 'transform ' + (0.1/game.state.speed) + 's';
-                eEl.style.transform = 'scale(1.2) translateX(-60px)';
-                await wait(150);
-                eEl.style.transform = 'scale(1) translateX(0)';
-                eEl.style.transition = 'transform ' + (0.3/game.state.speed) + 's';
-
-                game.audio.playSFX('hit'); 
-                const hRect = hEl.getBoundingClientRect();
-                game.ui.spawnParticles(hRect.left + hRect.width/2, hRect.top + hRect.height/2, '#ef4444', 'blood');
-
+                await wait(500); game.ui.log('Inimigo', 'turn-enemy');
+                eEl.style.transition = `transform ${0.1/game.state.speed}s`; eEl.style.transform = 'scale(1.2) translateX(-60px)';
+                await wait(150); eEl.style.transform = 'scale(1) translateX(0)'; eEl.style.transition = `transform ${0.3/game.state.speed}s`;
+                game.audio.playSFX('hit'); const hRect = hEl.getBoundingClientRect(); game.ui.spawnParticles(hRect.left+hRect.width/2, hRect.top+hRect.height/2, '#ef4444', 'blood');
                 let eDmg = Math.max(1, Math.floor(e.atk - p.def));
-                hEl.classList.add('shake');
-                game.ui.floatText('hero', `-${eDmg}`, '#ef4444');
-                p.curHp -= eDmg;
-                game.ui.updateBattleBars();
-                await wait(400);
-                hEl.classList.remove('shake');
+                hEl.classList.add('shake'); game.ui.floatText('hero', `-${eDmg}`, '#ef4444'); p.curHp -= eDmg;
+                game.ui.updateBattleBars(); await wait(400); hEl.classList.remove('shake');
 
-                if(p.curHp <= 0) { await wait(500); this.end(false); } 
-                else { game.state.busy = false; game.ui.renderBattleSkills(); }
+                if(p.curHp <= 0) { await wait(500); this.end(false); } else { game.state.busy = false; game.ui.renderBattleSkills(); }
             },
-
             async useItem(type) {
-                if(game.state.busy) return;
-                const u = game.getU();
+                if(game.state.busy) return; const u = game.getU();
                 if(u.inv[type] > 0) {
-                    u.inv[type]--;
-                    game.audio.playSFX('magic');
-                    if(type === 'hp') {
-                        game.state.p.curHp = Math.min(game.state.p.maxHp, game.state.p.curHp + 100);
-                        game.ui.floatText('hero', '+100', '#34d399');
-                    } else {
-                        game.state.p.curMp = Math.min(game.state.p.maxMp, game.state.p.curMp + 50);
-                        game.ui.floatText('hero', '+50 MP', '#60a5fa');
-                    }
-                    game.save();
-                    game.ui.updateBattleBars();
-                    game.state.busy = true;
-                    await wait(800);
-                    
-                    // Enemy turn (free hit)
+                    u.inv[type]--; game.audio.playSFX('magic');
+                    if(type==='hp') game.state.p.curHp = Math.min(game.state.p.maxHp, game.state.p.curHp+100);
+                    else game.state.p.curMp = Math.min(game.state.p.maxMp, game.state.p.curMp+50);
+                    game.save(); game.ui.updateBattleBars(); game.state.busy = true; await wait(800);
                     const eDmg = Math.max(1, Math.floor(game.state.e.atk - game.state.p.def));
-                    document.getElementById('heroFighter').classList.add('shake');
-                    game.audio.playSFX('hit');
-                    game.ui.floatText('hero', `-${eDmg}`, '#ef4444');
-                    game.state.p.curHp -= eDmg;
-                    game.ui.updateBattleBars();
-                    await wait(500);
-                    document.getElementById('heroFighter').classList.remove('shake');
-                    
+                    document.getElementById('heroFighter').classList.add('shake'); game.audio.playSFX('hit'); game.ui.floatText('hero', `-${eDmg}`, '#ef4444');
+                    game.state.p.curHp -= eDmg; game.ui.updateBattleBars(); await wait(500); document.getElementById('heroFighter').classList.remove('shake');
                     if(game.state.p.curHp <= 0) this.end(false); else game.state.busy = false;
                 } else game.ui.floatText('hero', 'Vazio!', '#aaa');
             },
-
-            flee() {
-                if(game.state.busy) return;
-                if(game.state.autoRuns > 0) { game.state.autoRuns = 0; game.state.inBattle = false; game.nav('menu'); } 
-                else game.ui.showConfirm("Fugir", "Abandonar batalha?", () => { game.state.inBattle = false; game.nav('menu'); });
-            },
-
+            flee() { if(game.state.busy) return; if(game.state.autoRuns > 0) { game.state.autoRuns=0; game.state.inBattle=false; game.nav('menu'); } else game.ui.showConfirm("Fugir", "Abandonar?", () => { game.state.inBattle=false; game.nav('menu'); }); },
             end(win) {
                 game.state.inBattle = false;
                 if(win) {
-                    game.audio.playSFX('win');
-                    const u = game.getU();
-                    const xp = game.state.mode === 'dungeon' ? 150 * game.state.lvl : 30 + (u.lvl*2);
-                    const gold = game.state.mode === 'dungeon' ? 100 * game.state.lvl : 20 + (u.lvl);
-                    u.xp += xp; u.gold += gold;
-                    let msg = `Você venceu!<br><span class="text-gold">+${gold} Ouro</span> | <span class="text-green">+${xp} XP</span>`;
+                    game.audio.playSFX('win'); const u = game.getU(); 
+                    let xp = game.state.mode==='dungeon' ? 150*game.state.lvl : 30+(u.lvl*2); 
+                    const gold = game.state.mode==='dungeon' ? 100*game.state.lvl : 20+(u.lvl);
                     
-                    if(game.state.mode === 'dungeon' && game.state.lvl === u.dungeonMax) { u.dungeonMax++; msg += "<br><b class='text-green'>Nova Masmorra!</b>"; }
-                    if(u.xp >= u.lvl * 100 && u.lvl < MAX_LEVEL) { u.lvl++; u.xp = 0; u.stats.pts += 3; u.inv.hp += 1; msg += `<br><br><b class='text-gold' style='font-size:1.4rem'>LEVEL UP ${u.lvl}!</b>`; }
-                    
-                    if(game.state.mode === 'dungeon' && Math.random() < 0.4 && DATA.scrolls.length > 0) { 
-                        const sc = DATA.scrolls[Math.floor(Math.random() * DATA.scrolls.length)]; 
-                        u.scrolls.push(sc.id); 
-                        msg += `<br>Drop: ${sc.n}`; 
-                    }
-                    
-                    game.save(); 
+                    // APPLY BOOST
+                    if(u.xpBoost > 0) { xp *= 3; u.xpBoost--; }
 
-                    if(game.state.autoRuns > 0) {
-                        game.state.autoRuns--;
-                        if(game.state.autoRuns > 0) {
-                            game.ui.floatText('hero', `Auto: ${game.state.autoRuns} left`, '#00ff00');
-                            setTimeout(() => { game.battle.start(game.state.mode, game.state.lvl); }, 1500);
-                            return; 
-                        }
+                    u.xp += xp; u.gold += gold;
+                    let msg = `Vitória!<br><span class="text-gold">+${gold} Ouro</span> | <span class="text-green">+${xp} XP</span>`;
+                    
+                    if(u.xpBoost > 0) msg += `<br><small style="color:violet">Booster Ativo (${u.xpBoost} left)</small>`;
+
+                    if(game.state.mode==='dungeon' && game.state.lvl === u.dungeonMax) { u.dungeonMax++; msg += "<br><b class='text-green'>Nova Masmorra!</b>"; }
+                    if(u.xp >= u.lvl*100 && u.lvl < MAX_LEVEL) { u.lvl++; u.xp=0; u.stats.pts+=3; u.inv.hp+=1; msg += `<br><br><b class='text-gold' style='font-size:1.4rem'>LEVEL UP ${u.lvl}!</b>`; }
+                    if(game.state.mode==='dungeon' && Math.random() < 0.4 && DATA.scrolls.length > 0) { 
+                        const sc = DATA.scrolls[Math.floor(Math.random()*DATA.scrolls.length)]; u.scrolls.push(sc.id); msg += `<br>Drop: ${sc.n}`; 
                     }
+                    game.save();
+                    if(game.state.autoRuns > 0) { game.state.autoRuns--; if(game.state.autoRuns > 0) { game.ui.floatText('hero', `Auto: ${game.state.autoRuns}`, '#0f0'); setTimeout(() => game.battle.start(game.state.mode, game.state.lvl), 1500); return; } }
                     game.ui.showModal("VITÓRIA", msg, true);
-                } else { 
-                    game.state.autoRuns = 0;
-                    game.ui.showModal("DERROTA", "Você caiu em combate.", false); 
-                    game.nav('menu'); 
-                }
+                } else { game.state.autoRuns=0; game.ui.showModal("DERROTA", "Você caiu.", false); game.nav('menu'); }
             }
         },
 
-        // --- CHARACTER & CALCS ---
+        calcStats() {
+            const u = game.getU();
+            let s = { atk:10, def:5, hp:200, mp:50, int:0, crit: 0 };
+            s.atk += (u.stats.str * 4) + (u.lvl * 2); s.hp += (u.stats.vit * 25) + (u.lvl * 20); s.mp += (u.stats.int * 15) + (u.lvl * 5); s.def += Math.floor(u.stats.str / 2) + u.lvl; s.int = u.stats.int;
+            u.equip.forEach(eid => { let it = DATA.items.find(x => x.id === eid); if(it) { if(it.atk) s.atk += it.atk; if(it.def) s.def += it.def; if(it.hp) s.hp += it.hp; if(it.int) s.mp += (it.int*5); if(it.crit) s.crit += it.crit; } });
+            let sets = {fire:0, water:0, wind:0}; 
+            u.scrollSlots.forEach(sid => { if(sid) { let sc = DATA.scrolls.find(x => x.id === sid); if(sc) { if(sc.atk) s.atk += sc.atk; if(sc.def) s.def += sc.def; if(sc.crit) s.crit += sc.crit; if(sc.hp) s.hp += sc.hp; if(sets[sc.t] !== undefined) sets[sc.t]++; } } });
+            if(sets.fire === 3) s.atk = Math.floor(s.atk * 1.3); if(sets.water === 3) s.hp = Math.floor(s.hp * 1.3);
+            return {s, sets};
+        },
+
+        // --- UI ---
         char: {
             render() {
-                const u = game.getU();
-                const calc = game.calcStats();
+                const u = game.getU(); const calc = game.calcStats();
                 document.getElementById('ptsDisplay').textContent = u.stats.pts;
                 ['str','int','vit'].forEach(s => document.getElementById('val'+(s.charAt(0).toUpperCase()+s.slice(1))).textContent = u.stats[s]);
-                document.getElementById('totalStats').innerHTML = `
-                    <div style="font-weight:bold;">⚔️ ${calc.s.atk} | 🛡️ ${calc.s.def}</div>
-                    <div style="margin-top:5px;"><span class="text-red">❤️ ${calc.s.hp}</span> | <span class="text-green">⚡ ${calc.s.mp}</span></div>
-                `;
+                document.getElementById('totalStats').innerHTML = `<div style="font-weight:bold;">⚔️ ${calc.s.atk} | 🛡️ ${calc.s.def} | 💥 ${calc.s.crit}%</div><div style="margin-top:5px;"><span class="text-red">❤️ ${calc.s.hp}</span> | <span class="text-green">⚡ ${calc.s.mp}</span></div>`;
                 u.scrollSlots.forEach((sid, idx) => {
                     const el = document.getElementById('slot'+idx);
                     el.className = 'inv-slot' + (sid ? ' equipped' : ' empty');
-                    if(sid) { const sc = DATA.scrolls.find(x=>x.id===sid); el.innerHTML = sc ? sc.i : '?'; } 
-                    else { el.innerHTML = '+'; }
+                    if(sid) { const sc = DATA.scrolls.find(x=>x.id===sid); el.innerHTML = sc ? sc.i : '?'; } else el.innerHTML = '+';
                 });
-                const sb = document.getElementById('setBonus'); sb.textContent = '';
-                if(calc.sets.fire === 3) sb.textContent = "🔥 Bônus de Fogo Ativo!";
-                if(calc.sets.water === 3) sb.textContent = "💧 Bônus de Água Ativo!";
             },
             addStat(s) { const u = game.getU(); if(u.stats.pts > 0) { u.stats.pts--; u.stats[s]++; game.save(); this.render(); } },
             openSlot(idx) {
                 game.state.tempSlot = idx; const u = game.getU(); const list = document.getElementById('scrollList'); list.innerHTML = '';
                 const counts = {}; u.scrolls.forEach(id => counts[id] = (counts[id]||0)+1); u.scrollSlots.forEach(id => { if(id && counts[id]) counts[id]--; });
-                let has = false; Object.keys(counts).forEach(sid => { if(counts[sid] > 0) { has = true; const sc = DATA.scrolls.find(x=>x.id === sid); 
-                    const btn = document.createElement('div'); btn.className = 'list-item'; btn.innerHTML = `<div><b>${sc.i} ${sc.n}</b> <small>x${counts[sid]}</small></div>`; btn.onclick = () => { u.scrollSlots[game.state.tempSlot] = sid; game.save(); document.getElementById('scrollModal').style.display = 'none'; game.char.render(); }; list.appendChild(btn); } });
+                let has = false; Object.keys(counts).forEach(sid => { if(counts[sid] > 0) { has = true; const sc = DATA.scrolls.find(x=>x.id === sid); const rarityClass = sc.rarity === 'l' ? 'scroll-rarity-l' : (sc.rarity === 'r' ? 'scroll-rarity-r' : 'scroll-rarity-c'); const row = document.createElement('div'); row.className = 'scroll-item-row'; row.innerHTML = `<div class="scroll-item-icon">${sc.i}</div><div class="scroll-item-info"><div style="font-weight:bold" class="${rarityClass}">${sc.n} <small style="color:#fff">x${counts[sid]}</small></div><div class="scroll-stats">Atk:${sc.atk} Def:${sc.def} Crit:${sc.crit}%</div><div class="scroll-desc">${sc.desc}</div></div>`; row.onclick = () => { u.scrollSlots[game.state.tempSlot] = sid; game.save(); document.getElementById('scrollModal').style.display = 'none'; game.char.render(); }; list.appendChild(row); } });
                 if(!has) list.innerHTML = '<p style="text-align:center; padding:10px; color:#aaa">Nenhum pergaminho disponível.</p>'; document.getElementById('scrollModal').style.display = 'flex';
             },
             unequipScroll() { const u = game.getU(); u.scrollSlots[game.state.tempSlot] = null; game.save(); document.getElementById('scrollModal').style.display = 'none'; game.char.render(); }
         },
-        calcStats() {
-            const u = game.getU();
-            let s = { atk:10, def:5, hp:200, mp:50, int:0 };
-            s.atk += (u.stats.str * 4) + (u.lvl * 2); s.hp += (u.stats.vit * 25) + (u.lvl * 20); s.mp += (u.stats.int * 15) + (u.lvl * 5); s.def += Math.floor(u.stats.str / 2) + u.lvl; s.int = u.stats.int;
-            u.equip.forEach(eid => { let it = DATA.items.find(x => x.id === eid); if(it) { if(it.atk) s.atk += it.atk; if(it.def) s.def += it.def; if(it.hp) s.hp += it.hp; if(it.int) s.mp += (it.int*5); } });
-            let sets = {fire:0, water:0, wind:0}; u.scrollSlots.forEach(sid => { if(sid) { let sc = DATA.scrolls.find(x => x.id === sid); if(sc) { if(sc.atk) s.atk += sc.atk; if(sc.hp) s.hp += sc.hp; if(sc.def) s.def += sc.def; if(sets[sc.t] !== undefined) sets[sc.t]++; } } });
-            if(sets.fire === 3) s.atk = Math.floor(s.atk * 1.3); if(sets.water === 3) s.hp = Math.floor(s.hp * 1.3);
-            return {s, sets};
-        },
-
-        // --- UI RENDERERS ---
         ui: {
             renderHome() {
-                const u = game.getU();
-                document.getElementById('homeName').textContent = u.name; document.getElementById('homeLvl').textContent = u.lvl; document.getElementById('homeGold').textContent = u.gold; document.getElementById('homeAv').textContent = u.av; document.getElementById('homeBigAv').textContent = u.av;
+                const u = game.getU(); document.getElementById('homeName').textContent = u.name; document.getElementById('homeLvl').textContent = u.lvl; document.getElementById('homeGold').textContent = u.gold; document.getElementById('homeAv').textContent = u.av; document.getElementById('homeBigAv').textContent = u.av;
                 const pct = Math.min(100, (u.xp / (u.lvl * 100)) * 100); document.getElementById('homeXp').style.width = pct + '%';
+                if(u.xpBoost > 0) { document.getElementById('homeBoost').style.display = 'block'; document.getElementById('homeBoost').textContent = `XP x3 ATIVO (${u.xpBoost} Batalhas)`; }
+                else document.getElementById('homeBoost').style.display = 'none';
+            },
+            useBooster(id) {
+                const u = game.getU();
+                if(u.xpBoost > 0) { this.showModal("Aviso", "Você já tem um booster ativo!"); return; }
+                const idx = u.bag.indexOf(id);
+                if(idx > -1) {
+                    u.bag.splice(idx, 1);
+                    u.xpBoost = 5;
+                    game.save();
+                    this.showModal("Sucesso", "Poção da Sabedoria usada!<br><b>XP Triplo</b> pelas próximas 5 batalhas.");
+                    this.renderInv();
+                }
             },
             openAvatarSelect() {
                 const box = document.getElementById('avatarList'); box.innerHTML = '';
@@ -1020,66 +915,54 @@
                 document.getElementById('createModal').style.display = 'flex';
             },
             spawnParticles(x, y, color, type) {
-                const isMagic = type === 'energy' || type === 'magic';
-                const count = isMagic ? 40 : 15;
+                const count = (type === 'magic') ? 40 : 15;
                 for(let i=0; i<count; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'particle';
-                    p.style.backgroundColor = color;
-                    p.style.left = x + 'px';
-                    p.style.top = y + 'px';
-                    if(isMagic) {
-                        p.style.boxShadow = `0 0 10px ${color}`; p.style.width = (Math.random()*10 + 4) + 'px'; p.style.height = p.style.width;
-                        const angle = Math.random() * Math.PI * 2; const vel = Math.random() * 100 + 40;
-                        p.style.setProperty('--tx', Math.cos(angle) * vel + 'px'); p.style.setProperty('--ty', Math.sin(angle) * vel + 'px');
+                    const p = document.createElement('div'); p.className = 'particle'; p.style.backgroundColor = color; p.style.left = x + 'px'; p.style.top = y + 'px';
+                    if(type === 'magic') {
+                        p.style.boxShadow = `0 0 10px ${color}`; p.style.width = (Math.random()*8+4)+'px'; p.style.height = p.style.width;
+                        const a = Math.random()*Math.PI*2; const v = Math.random()*100+40;
+                        p.style.setProperty('--tx', Math.cos(a)*v+'px'); p.style.setProperty('--ty', Math.sin(a)*v+'px');
                         p.style.animation = `particleBang ${0.5/game.state.speed}s ease-out forwards`;
                     } else {
-                        p.style.width = (Math.random()*6 + 2) + 'px'; p.style.height = p.style.width;
-                        const angle = (Math.random() * Math.PI) + Math.PI; const vel = Math.random() * 80 + 20;
-                        p.style.setProperty('--tx', Math.cos(angle) * 30 + 'px'); p.style.setProperty('--ty', vel + 'px');
+                        p.style.width = (Math.random()*6+2)+'px'; p.style.height = p.style.width;
+                        const a = Math.random()*Math.PI + Math.PI; const v = Math.random()*80+20;
+                        p.style.setProperty('--tx', Math.cos(a)*30+'px'); p.style.setProperty('--ty', v+'px');
                         p.style.animation = `particleGravity ${0.6/game.state.speed}s ease-in forwards`;
                     }
                     document.body.appendChild(p); setTimeout(() => p.remove(), 1000/game.state.speed);
                 }
             },
             log(txt, type) {
-                const box = document.getElementById('battleLog');
-                const el = document.createElement('div');
-                el.className = `log-entry ${type}`;
-                el.textContent = txt;
-                box.appendChild(el);
-                // Keep max 2
-                if(box.children.length > 2) box.removeChild(box.firstChild);
-                // Auto fade
-                setTimeout(() => el.remove(), 1500);
+                const box = document.getElementById('battleLog'); const el = document.createElement('div'); el.className = `log-entry ${type}`; el.textContent = txt; box.appendChild(el);
+                if(box.children.length > 2) box.removeChild(box.firstChild); setTimeout(() => el.remove(), 1500);
             },
             renderShop() {
                 const u = game.getU(); document.getElementById('shopGoldDisplay').textContent = u.gold; const list = document.getElementById('shopList'); list.innerHTML = '';
                 DATA.items.forEach(it => { 
                     const owned = (it.type==='eq' && u.bag.includes(it.id)); 
-                    const card = document.createElement('div'); card.className = 'shop-card';
+                    const rClass = it.rarity ? `rarity-${it.rarity}` : '';
+                    const card = document.createElement('div'); card.className = `shop-card ${rClass}`;
                     card.innerHTML = `<div class="shop-card-icon">${it.i}</div><div class="shop-card-title">${it.n}</div><div class="shop-card-desc">${it.desc}</div><button class="btn ${owned?'btn-ghost':'btn-green'}" onclick="game.ui.buy('${it.id}')" ${owned?'disabled':''}>${owned ? 'OK' : it.p + ' 💰'}</button>`;
                     list.appendChild(card); 
                 });
             },
-            buy(id) {
-                const u = game.getU(); const it = DATA.items.find(x => x.id === id);
-                if(u.gold >= it.p) { u.gold -= it.p; if(it.type === 'pot') u.inv[id] = (u.inv[id]||0) + 1; else u.bag.push(id); game.save(); this.renderShop(); } 
-                else this.showModal("Loja", "Você não tem ouro suficiente!");
-            },
+            buy(id) { const u = game.getU(); const it = DATA.items.find(x => x.id === id); if(u.gold >= it.p) { u.gold -= it.p; if(it.type === 'pot' || it.type === 'boost') { if(!u.inv[id] && it.type==='boost') u.bag.push(id); else if(it.type==='pot') u.inv[id] = (u.inv[id]||0) + 1; else u.bag.push(id); } else u.bag.push(id); game.save(); this.renderShop(); } else this.showModal("Loja", "Sem ouro!"); },
             renderInv() {
-                const u = game.getU(); const list = document.getElementById('invList'); list.innerHTML = '';
-                const allItems = [];
-                if(u.inv.hp > 0) allItems.push({id:'hp', n:'Poção Vida', i:'🍷', qty:u.inv.hp});
-                if(u.inv.mp > 0) allItems.push({id:'mp', n:'Poção Mana', i:'🧪', qty:u.inv.mp});
+                const u = game.getU(); const list = document.getElementById('invList'); list.innerHTML = ''; const allItems = [];
+                if(u.inv.hp > 0) allItems.push({id:'hp', n:'Poção Vida', i:'🍷', qty:u.inv.hp}); if(u.inv.mp > 0) allItems.push({id:'mp', n:'Poção Mana', i:'🧪', qty:u.inv.mp});
                 u.bag.forEach(bid => { const it = DATA.items.find(x=>x.id===bid); if(it) allItems.push({...it, qty:1}); });
                 for(let i=0; i<20; i++) {
-                    const it = allItems[i];
-                    const slot = document.createElement('div');
-                    slot.className = 'inv-slot' + (it ? (u.equip.includes(it.id) ? ' equipped' : '') : ' empty');
+                    const it = allItems[i]; const slot = document.createElement('div');
+                    const rClass = (it && it.rarity) ? `rarity-${it.rarity}` : '';
+                    const eqClass = (it && u.equip.includes(it.id)) ? ' equipped' : '';
+                    slot.className = `inv-slot ${rClass}${eqClass}` + (!it ? ' empty' : '');
                     if(it) {
                         slot.innerHTML = `<div>${it.i}</div>${it.qty > 1 ? `<div class="inv-qty">${it.qty}</div>` : ''}`;
-                        slot.onclick = () => { if(it.id === 'hp' || it.id === 'mp') return; game.ui.toggleEquip(it.id); };
+                        slot.onclick = () => { 
+                            if(it.type === 'boost') game.ui.useBooster(it.id);
+                            else if(it.id === 'hp' || it.id === 'mp') return; 
+                            else game.ui.toggleEquip(it.id); 
+                        };
                     }
                     list.appendChild(slot);
                 }
@@ -1094,30 +977,15 @@
                 Object.keys(DATA.skills).forEach(k => { const s = DATA.skills[k]; if(u.lvl < 2 && k !== 'normal') return; if(u.lvl < 3 && (k === 'ice' || k === 'thunder')) return; if(u.lvl < 5 && (k === 'special' || k === 'ultimate')) return; const btn = document.createElement('div'); const cant = mp < s.c; btn.className = `skill-btn ${cant ? 'disabled' : ''}`; btn.innerHTML = `<span class="skill-icon">${s.i}</span><span class="skill-info">${s.n}<br>${s.c} MP</span>`; btn.onclick = () => { if(!cant) game.battle.turn(k); }; box.appendChild(btn); });
             },
             updateBattleBars() {
-                const p = game.state.p; const e = game.state.e;
-                document.getElementById('bHeroHp').style.width = Math.max(0, (p.curHp/p.maxHp)*100) + '%'; document.getElementById('bHeroMp').style.width = Math.max(0, (p.curMp/p.maxMp)*100) + '%'; document.getElementById('bEnemyHp').style.width = Math.max(0, (e.curHp/e.maxHp)*100) + '%';
-                document.getElementById('bPotHp').textContent = game.getU().inv.hp || 0; document.getElementById('bPotMp').textContent = game.getU().inv.mp || 0;
+                const p = game.state.p; const e = game.state.e; document.getElementById('bHeroHp').style.width = Math.max(0, (p.curHp/p.maxHp)*100) + '%'; document.getElementById('bHeroMp').style.width = Math.max(0, (p.curMp/p.maxMp)*100) + '%'; document.getElementById('bEnemyHp').style.width = Math.max(0, (e.curHp/e.maxHp)*100) + '%'; document.getElementById('bPotHp').textContent = game.getU().inv.hp || 0; document.getElementById('bPotMp').textContent = game.getU().inv.mp || 0;
             },
             floatText(target, txt, color) { const box = document.getElementById(target === 'hero' ? 'floatHero' : 'floatEnemy'); const el = document.createElement('div'); el.className = 'float-txt'; el.textContent = txt; el.style.color = color; box.appendChild(el); setTimeout(() => el.remove(), 800/game.state.speed); },
             showModal(title, text, isWin) { 
-                document.getElementById('modalTitle').textContent = title; 
-                document.getElementById('modalBody').innerHTML = text; 
-                const btnArea = document.getElementById('modalBtns'); btnArea.innerHTML = '';
-                if(isWin && game.state.mode === 'dungeon') {
-                    const farmBtn = document.createElement('button'); farmBtn.className = 'btn btn-blue'; farmBtn.textContent = '⚡ Farmar x5'; farmBtn.onclick = () => game.startAutoFarm(); btnArea.appendChild(farmBtn);
-                }
-                const closeBtn = document.createElement('button'); closeBtn.className = 'btn'; closeBtn.textContent = 'Continuar'; closeBtn.onclick = () => game.ui.closeModal(); btnArea.appendChild(closeBtn);
-                document.getElementById('modal').style.display = 'flex'; 
+                document.getElementById('modalTitle').textContent = title; document.getElementById('modalBody').innerHTML = text; const btnArea = document.getElementById('modalBtns'); btnArea.innerHTML = '';
+                if(isWin && game.state.mode === 'dungeon') { const farmBtn = document.createElement('button'); farmBtn.className = 'btn btn-blue'; farmBtn.textContent = '⚡ Farmar x5'; farmBtn.onclick = () => game.startAutoFarm(); btnArea.appendChild(farmBtn); }
+                const closeBtn = document.createElement('button'); closeBtn.className = 'btn'; closeBtn.textContent = 'Continuar'; closeBtn.onclick = () => game.ui.closeModal(); btnArea.appendChild(closeBtn); document.getElementById('modal').style.display = 'flex'; 
             },
-            showConfirm(title, text, onYes) { 
-                document.getElementById('confirmTitle').textContent = title; 
-                document.getElementById('confirmBody').innerHTML = text; 
-                const yesBtn = document.getElementById('confirmBtnYes'); 
-                const newBtn = yesBtn.cloneNode(true);
-                yesBtn.parentNode.replaceChild(newBtn, yesBtn);
-                newBtn.onclick = () => { document.getElementById('confirmModal').style.display = 'none'; onYes(); }; 
-                document.getElementById('confirmModal').style.display = 'flex'; 
-            },
+            showConfirm(title, text, onYes) { document.getElementById('confirmTitle').textContent = title; document.getElementById('confirmBody').innerHTML = text; const yesBtn = document.getElementById('confirmBtnYes'); const newBtn = yesBtn.cloneNode(true); yesBtn.parentNode.replaceChild(newBtn, yesBtn); newBtn.onclick = () => { document.getElementById('confirmModal').style.display = 'none'; onYes(); }; document.getElementById('confirmModal').style.display = 'flex'; },
             closeModal() { document.getElementById('modal').style.display = 'none'; if(!game.state.inBattle) game.nav('menu'); }
         }
     };
