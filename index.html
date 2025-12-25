@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WDev Legends - v12 Hardcore</title>
+    <title>WDev Legends</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -298,12 +298,12 @@
             <div class="panel">
                 <div style="font-size: 4rem; margin-bottom: 10px;">⚔️</div>
                 <h1 style="font-size: 2rem; color: var(--primary);">WDev<br>Legends</h1>
-                <p style="color:#aaa; margin-bottom: 30px; font-size: 0.8rem;">HARDCORE v12</p>
+                <p style="color:#aaa; margin-bottom: 30px; font-size: 0.8rem;">v4.0</p>
                 <input type="text" id="loginUser" placeholder="Nome do Herói">
                 <input type="password" id="loginPass" placeholder="Senha">
                 <button class="btn" style="margin-top:15px" id="btnLogin" onclick="game.login()">Jogar Agora</button>
                 <div id="errorMsg"></div>
-                <button class="btn-link" onclick="game.resetData()">⚠️ Resetar Dados</button>
+                <button class="btn-link" onclick="game.resetData()">Resetar Dados</button>
             </div>
         </div>
 
@@ -413,19 +413,19 @@
 
             <div style="width:100%; margin-bottom:15px;">
                 <div class="stat-row">
-                    <div class="stat-name">💪 Força <small style="font-weight:normal;color:#666">(Dano/Def)</small></div>
+                    <div class="stat-name">💪 Força <small style="font-weight:normal;color:#667">(Dano/Def)</small></div>
                     <div class="stat-val-box">
                         <b id="valStr">0</b> <button class="stat-btn" onclick="game.char.addStat('str')">+</button>
                     </div>
                 </div>
                 <div class="stat-row">
-                    <div class="stat-name">🧠 Mente <small style="font-weight:normal;color:#666">(Mana/Mag)</small></div>
+                    <div class="stat-name">🧠 Mente <small style="font-weight:normal;color:#667">(Mana/Mag)</small></div>
                     <div class="stat-val-box">
                         <b id="valInt">0</b> <button class="stat-btn" onclick="game.char.addStat('int')">+</button>
                     </div>
                 </div>
                 <div class="stat-row">
-                    <div class="stat-name">❤️ Vida <small style="font-weight:normal;color:#666">(HP Max)</small></div>
+                    <div class="stat-name">❤️ Vida <small style="font-weight:normal;color:#667">(HP Max)</small></div>
                     <div class="stat-val-box">
                         <b id="valVit">0</b> <button class="stat-btn" onclick="game.char.addStat('vit')">+</button>
                     </div>
@@ -439,7 +439,7 @@
                 <div class="c-stat"><span class="c-val text-gold" id="totalCrit">0%</span><span class="c-label">Crítico</span></div>
             </div>
 
-            <h3 style="margin-bottom:10px;">Runas Antigas</h3>
+            <h3 style="margin-bottom:10px;">Pergaminhos</h3>
             <div class="scroll-slots">
                 <div class="scroll-slot" id="slot0" onclick="game.char.openSlot(0)"></div>
                 <div class="scroll-slot" id="slot1" onclick="game.char.openSlot(1)"></div>
